@@ -26,6 +26,7 @@ import com.android.volley.toolbox.Volley;
 
 import net.named_data.jndn.Data;
 import net.named_data.jndn.Name;
+import net.named_data.jndn.security.KeyChain;
 import net.named_data.jndn.security.SecurityException;
 import net.named_data.jndn.security.certificate.IdentityCertificate;
 import net.named_data.jndn.security.certificate.PublicKey;
@@ -34,6 +35,7 @@ import net.named_data.jndn.security.identity.FilePrivateKeyStorage;
 import net.named_data.jndn.security.identity.IdentityManager;
 import net.named_data.jndn.security.identity.IdentityStorage;
 import net.named_data.jndn.security.identity.PrivateKeyStorage;
+import net.named_data.jndn.security.v2.CertificateV2;
 import net.named_data.jndn.util.Blob;
 
 import java.io.UnsupportedEncodingException;
@@ -121,13 +123,14 @@ public class InstallCertificate extends AppCompatActivity {
                         Data data = new Data();
                         try {
                             data.wireDecode(blob);
-                            IdentityCertificate certificate = new IdentityCertificate(data);
+                            CertificateV2 certificate = new CertificateV2(data);
 
-                            String dbPath = getApplicationContext().getFilesDir().getAbsolutePath() + "/" + MainActivity.DB_NAME;
-                            IdentityStorage identityStorage = new AndroidSqlite3IdentityStorage(dbPath);
-                            identityStorage.addCertificate(certificate);
-                            identityStorage.setDefaultCertificateNameForKey(certificate.getPublicKeyName(), certificate.getName());
-                            identityStorage.setDefaultKeyNameForIdentity(certificate.getPublicKeyName());
+                            KeyChain keyChain = new KeyChain();
+                            Name identity = CertificateV2.extractIdentityFromCertName(certificate.getName());
+                            keyChain.getPib().addIdentity_(identity);
+                            keyChain.getPib().getIdentity(identity).setDefaultKey_(certificate.getPublicKey().buf(), certificate.getKeyName());
+                            keyChain.getPib().getIdentity(identity).getDefaultKey().setDefaultCertificate_(certificate);
+                            // can we use keychain setDefaultCertificate here instead?
 
                             // Gets the data repository in write mode
                             DataBaseHelper dbHelper = new DataBaseHelper(getApplicationContext());
@@ -135,7 +138,7 @@ public class InstallCertificate extends AppCompatActivity {
 
                             // Create a new map of values, where column names are the keys
                             ContentValues values = new ContentValues();
-                            Name keyName = certificate.getPublicKeyName();
+                            Name keyName = certificate.getKeyName();
                             Name identityName = keyName.getPrefix(keyName.size() - 1);
                             values.put(DataBaseSchema.IdentityEntry.COLUMN_NAME_CERTIFICATE, certificate.getName().toUri());
                             values.put(DataBaseSchema.IdentityEntry.COLUMN_NAME_APPROVED, true);

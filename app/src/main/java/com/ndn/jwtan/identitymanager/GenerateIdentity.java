@@ -23,16 +23,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.named_data.jndn.Name;
-import net.named_data.jndn.security.certificate.IdentityCertificate;
-import net.named_data.jndn.security.identity.AndroidSqlite3IdentityStorage;
-import net.named_data.jndn.security.identity.FilePrivateKeyStorage;
-import net.named_data.jndn.security.identity.IdentityManager;
-import net.named_data.jndn.security.identity.IdentityStorage;
-import net.named_data.jndn.security.identity.PrivateKeyStorage;
+import net.named_data.jndn.security.KeyChain;
+import net.named_data.jndn.security.policy.NoVerifyPolicyManager;
+import net.named_data.jndn.security.v2.CertificateV2;
+import net.named_data.jndn.security.pib.AndroidSqlite3Pib;
+import net.named_data.jndn.security.tpm.TpmBackEndFile;
 
 import org.json.JSONObject;
 
@@ -153,20 +153,21 @@ public class GenerateIdentity extends AppCompatActivity {
     private String generateKey() throws net.named_data.jndn.security.SecurityException {
         String identity = assignedNamespace;
 
-        String dbPath = getApplicationContext().getFilesDir().getAbsolutePath() + "/" + MainActivity.DB_NAME;
-        String certDirPath = getApplicationContext().getFilesDir().getAbsolutePath() + "/" + MainActivity.CERT_DIR;
+        String path = getApplicationContext().getFilesDir().getAbsolutePath();
+        try {
+            AndroidSqlite3Pib storage = new AndroidSqlite3Pib(path, MainActivity.DB_NAME);
+            TpmBackEndFile tpm = new TpmBackEndFile(path + "/" + MainActivity.CERT_DIR);
+            final KeyChain keyChain = new KeyChain(storage, tpm, new
+                    NoVerifyPolicyManager());
+            keyChain.createIdentityV2(new Name(identity));
+            CertificateV2 certificate = keyChain.getPib().getIdentity(new Name(identity)).getDefaultKey().getDefaultCertificate();
 
-        IdentityStorage identityStorage = new AndroidSqlite3IdentityStorage(dbPath);
-        PrivateKeyStorage privateKeyStorage = new FilePrivateKeyStorage(certDirPath);
-        IdentityManager identityManager = new IdentityManager(identityStorage, privateKeyStorage);
-
-        Name identityName = new Name(identity);
-
-        Name keyName = identityManager.generateRSAKeyPairAsDefault(identityName, true);
-        IdentityCertificate certificate = identityManager.selfSign(keyName);
-
-        String encodedString = Base64.encodeToString(certificate.wireEncode().getImmutableArray(), Base64.DEFAULT);
-        return encodedString;
+            String encodedString = Base64.encodeToString(certificate.wireEncode().getImmutableArray(), Base64.DEFAULT);
+            return encodedString;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ""; // fix this
+        }
     }
 
     private void sendHttpPostRequest(final String name, final String certification) {

@@ -202,9 +202,9 @@ public class InstallCertificate extends AppCompatActivity {
         final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
 
         final String tmDevice, tmSerial, androidId;
-        tmDevice = "" + tm.getDeviceId();
-        tmSerial = "" + tm.getSimSerialNumber();
-        androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+        tmDevice = tm.getDeviceId();
+        tmSerial = tm.getSimSerialNumber();
+        androidId = android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
 
         UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
         String deviceId = deviceUuid.toString();
@@ -220,8 +220,7 @@ public class InstallCertificate extends AppCompatActivity {
         Name identityName = new Name(userIdentityName).append(deviceId);
 
         // For now, we always generate a new device certificate upon successful user identity request
-        // TODO: behavior when a device identity already exists?
-        if (true) {
+        if (true/*TODO: identityName.exists()*/) {
             Name keyName = identityManager.generateRSAKeyPairAsDefault(identityName, true);
             PublicKey publicKey = identityManager.getPublicKey(keyName);
 

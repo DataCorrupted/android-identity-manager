@@ -174,7 +174,6 @@ public class GenerateToken extends AppCompatActivity {
     public void returnClick(View view) {
         Intent i = new Intent(GenerateToken.this, MainActivity.class);
         startActivity(i);
-        return;
     }
 
     public void tab1Click(View view) {
@@ -202,7 +201,7 @@ public class GenerateToken extends AppCompatActivity {
         String idName = editID.getText().toString();
 
         if (isValidEmailAddress(email)) {
-            if (idName != "") {
+            if (! idName.equals("")) {
                 this.caption = idName;
                 viewPager.setCurrentItem(2);
                 tab2.setIcon(R.drawable.icon_filled);

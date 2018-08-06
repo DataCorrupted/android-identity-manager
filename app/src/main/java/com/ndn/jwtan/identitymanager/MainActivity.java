@@ -1,7 +1,6 @@
 package com.ndn.jwtan.identitymanager;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     public void generateOrViewIdentity(View view) {
         FloatingActionButton fab = (FloatingActionButton) view;
         if (fab.getTag(R.string.tags_if_taken) == slotTaken) {
-            if (usage == "authorize") {
+            if (usage.equals("authorize")) {
                 //authorizeApp((String) fab.getTag(R.string.tags_id_name));
                 Intent resultIntent = new Intent();
                 // Although we have a device ID, the user ID is used to sign app ID

@@ -57,7 +57,7 @@ public class SignAppCertificate extends Activity {
             Intent result = new Intent();
             result.putExtra("signed_cert", signedCert);
 
-            if (signedCert != "") {
+            if (!signedCert.equals("")) {
                 setResult(Activity.RESULT_OK, result);
             } else {
                 setResult(Activity.RESULT_CANCELED, result);

@@ -86,8 +86,7 @@ public class InstallCertificate extends AppCompatActivity {
 
         // Get the message from the intent
         Intent intent = getIntent();
-        String name = intent.getStringExtra(UriHandler.EXTRA_MESSAGE_NAME);
-        mName = name;
+        mName = intent.getStringExtra(UriHandler.EXTRA_MESSAGE_NAME);
 
         sendHttpGetRequest();
     }
@@ -95,7 +94,6 @@ public class InstallCertificate extends AppCompatActivity {
     public void returnClick(View view) {
         Intent i = new Intent(InstallCertificate.this, MainActivity.class);
         startActivity(i);
-        return;
     }
 
     ////////////////////////////////////////////////////////////

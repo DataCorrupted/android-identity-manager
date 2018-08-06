@@ -23,7 +23,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -146,7 +145,6 @@ public class GenerateIdentity extends AppCompatActivity {
     public void returnClick(View view) {
         Intent i = new Intent(GenerateIdentity.this, MainActivity.class);
         startActivity(i);
-        return;
     }
 
     ////////////////////////////////////////////////////////////
@@ -162,8 +160,7 @@ public class GenerateIdentity extends AppCompatActivity {
             keyChain.createIdentityV2(new Name(identity));
             CertificateV2 certificate = keyChain.getPib().getIdentity(new Name(identity)).getDefaultKey().getDefaultCertificate();
 
-            String encodedString = Base64.encodeToString(certificate.wireEncode().getImmutableArray(), Base64.DEFAULT);
-            return encodedString;
+            return Base64.encodeToString(certificate.wireEncode().getImmutableArray(), Base64.DEFAULT);
         } catch (Exception e) {
             e.printStackTrace();
             return ""; // fix this
@@ -182,7 +179,6 @@ public class GenerateIdentity extends AppCompatActivity {
                         try {
                             JSONObject jsResponse = new JSONObject(response);
 
-                            DialogFragment newFragment;
                             if (jsResponse.getInt("status") == 200) {
                                 /*
                                 newFragment = new MessageDialogFragment(R.string.submit_success);
@@ -195,9 +191,6 @@ public class GenerateIdentity extends AppCompatActivity {
                             else if (jsResponse.getInt("status") == 2) {
                                 TextView hintText = (TextView) findViewById(R.id.step4Hint);
                                 hintText.setText(R.string.submit_fail);
-                            }
-                            else {
-
                             }
 
                             Button returnBtn = (Button) findViewById(R.id.returnBtn);

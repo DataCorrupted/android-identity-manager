@@ -62,3 +62,16 @@ Screen recording on Android 4.4.4 (Kitkat): https://vimeo.com/151273751
 
 * Open in Android Studio, SDK 22, build tools 22.0.1; sync Gradle
 * Clone 'volley': git clone https://android.googlesource.com/platform/frameworks/volley (currently not in submodule)
+
+
+# TODO
+
+## Put ndncert in
+
+Let's use JNI, Alex provided a great example of how to use it. The thoughts should be the following:
+
+Zhiyi has provided a great demo. In his demo, he created a ClientTool class, which, to me, can be used almost verbatim with little change, the changes includes but not limited to:
+
+1. add JNI environment to it so that we can transfer out result(certificate) back.
+2. change getline() to a Java function that can: a) pop out a window with input text place 2) gets the string. After that we can transfer that jobject to std::string and do everything as normal. Please refer to [here](https://stackoverflow.com/questions/5198105/calling-a-java-method-from-c-in-android) for how this should be done.
+3. As to Java String and std::string's difference and how to transferring from one to another, refer to [here](http://electrofriends.com/articles/jni/jni-part-4-jni-strings/)

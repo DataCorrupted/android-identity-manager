@@ -1,13 +1,20 @@
 apply plugin: 'com.android.application'
+apply plugin: 'cpp'
+
+model{
+    components{
+        ndncert(NativeLibrarySpec)
+    }
+}
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.2'
 
     defaultConfig {
         applicationId "com.ndn.jwtan.identitymanager"
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         multiDexEnabled true //important
@@ -27,6 +34,6 @@ dependencies {
         exclude group: 'org.xerial'
     }
     api 'com.android.volley:volley:1.1.1'
-    api 'com.android.support:appcompat-v7:25.4.0'
-    api 'com.android.support:design:25.4.0'
+    api 'com.android.support:appcompat-v7:28.0.0-beta01'
+    api 'com.android.support:design:28.0.0-beta01'
 }

@@ -5,5 +5,5 @@ public class NdncertClient {
         System.loadLibrary("ndncert-client");
     }
 
-    static public native String helloWorld();
+    static public native String init();
 }

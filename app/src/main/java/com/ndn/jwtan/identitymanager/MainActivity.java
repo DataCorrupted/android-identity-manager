@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             usage = "authorize";
         }
 
-        Log.i("Peter", NdncertClient.helloWorld());
+        Log.i("Peter", NdncertClient.init());
         Log.e("zhehao", usage);
 
         super.onCreate(savedInstanceState);

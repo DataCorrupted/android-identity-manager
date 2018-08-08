@@ -4,7 +4,7 @@
 
 #include "com_ndn_jwtan_identitymanager_NdncertClient.h"
 
-JNIEXPORT jstring JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_helloWorld
+JNIEXPORT jstring JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_init
         (JNIEnv * env, jclass obj){
-    return env->NewStringUTF("Hello World.");
+    return env->NewStringUTF("JNI init succeeded");
 }

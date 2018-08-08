@@ -18,7 +18,21 @@ android {
         versionCode 1
         versionName "1.0"
         multiDexEnabled true //important
+        ndk{
+            moduleName "ndncert-client"
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
+        sourceSets.main {
+            jni.srcDirs = []
+            jniLibs.srcDir "src/main/obj"
+        }
     }
+    externalNativeBuild {
+        ndkBuild{
+            path "src/main/jni/Android.mk"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false

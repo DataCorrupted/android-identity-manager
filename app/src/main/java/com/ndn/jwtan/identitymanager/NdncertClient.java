@@ -6,4 +6,5 @@ public class NdncertClient {
     }
 
     static public native String init();
+
 }

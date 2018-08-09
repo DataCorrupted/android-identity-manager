@@ -75,3 +75,11 @@ Zhiyi has provided a great demo. In his demo, he created a ClientTool class, whi
 1. add JNI environment to it so that we can transfer out result(certificate) back.
 2. change getline() to a Java function that can: a) pop out a window with input text place 2) gets the string. After that we can transfer that jobject to std::string and do everything as normal. Please refer to [here](https://stackoverflow.com/questions/5198105/calling-a-java-method-from-c-in-android) for how this should be done.
 3. As to Java String and std::string's difference and how to transferring from one to another, refer to [here](http://electrofriends.com/articles/jni/jni-part-4-jni-strings/)
+
+For how to init JNI, refer to these:
+
+https://medium.com/@ssaurel/create-your-first-jni-application-on-android-with-the-ndk-5f149508fb12
+
+http://kn-gloryo.github.io/Build_NDK_AndroidStudio_detail/
+
+For testing, you can initiate a Android Virtual Device(AVD)(Android-studio -> Tools -> AVD). But be aware that this device is not stable.

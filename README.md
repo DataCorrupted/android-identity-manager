@@ -76,10 +76,53 @@ Zhiyi has provided a great demo. In his demo, he created a ClientTool class, whi
 2. change getline() to a Java function that can: a) pop out a window with input text place 2) gets the string. After that we can transfer that jobject to std::string and do everything as normal. Please refer to [here](https://stackoverflow.com/questions/5198105/calling-a-java-method-from-c-in-android) for how this should be done.
 3. As to Java String and std::string's difference and how to transferring from one to another, refer to [here](http://electrofriends.com/articles/jni/jni-part-4-jni-strings/)
 
+## Status
+
+I have setup the environment, almost a whole week is spent on that.
+
+### Init JNI
+
 For how to init JNI, refer to these:
 
 https://medium.com/@ssaurel/create-your-first-jni-application-on-android-with-the-ndk-5f149508fb12
 
 http://kn-gloryo.github.io/Build_NDK_AndroidStudio_detail/
 
-For testing, you can initiate a Android Virtual Device(AVD)(Android-studio -> Tools -> AVD). But be aware that this device is not stable.
+For compiling, although you can set up gradle and ask it to compile cpp for you, it's awkward as gradle will not tell where is the error in cpp, it only reports java exception. 
+
+It's suggested that you setup ndk-build tool mentioned [here](http://kn-gloryo.github.io/Build_NDK_AndroidStudio_detail/) and use it to compile when you are debugging and use gradle when your are done with JNI.
+
+For testing, you can initiate a Android Virtual Device(AVD)(Android-studio -> Tools -> AVD). But be aware that this device is not stable. Do notice that your device only have 1G space by default. When you run out of space, you can kill it and create a new one.
+
+### Put ndn-cxx as dependency
+
+Please refer to Alex's NFD-android's [README-dev.md](https://github.com/named-data-mobile/NFD-android/blob/master/README-dev.md).
+
+Alex is using crew, a tool that will compile your cpp code into different architectures and you can import the compiled dynamically linked library to your Android project as your cpp's dependency.
+
+Reproduce Alex's work so that you have a better understanding of crew and then switch to ours:
+
+1. You don't need his crew repo, use the one I forked [here](https://github.com/DataCorrupted/android-crew-staging/tree/for-ndk-r18). I have put a script for ndncert inside.
+
+2. Alex is using command line tool, that's why in his script you need to download sdk first. But we are using IDE, sdk is (most likely) already presented in _~/Android/Sdk_. So please do the following:
+
+```shell
+cd ~/Android/Sdk/ndk-bundle
+git clone https://github.com/DataCorrupted/android-crew-staging.git crew.dir
+cd crew.dir
+
+# If install is not working, download the source code and built it.
+# I encountered bad SHA256 sum problem. Not figure out why yet
+./crew install target/sqlite target/openssl target/boost
+./crew install target/ndn_cxx
+```
+
+3. The script I wrote for ndncert is not working as it has linking problems. I have asked Alex, he hasn't replied yet. **Please help me fix it**
+
+4. Go to IDE and see our jni part. I have included ndn-cxx and it's working. The only thing I left un-handled is ndncert. Once you finish that, you can add do the following:
+add _ndncert_ to _LOCAL_SHARED_LIBRARIES_ and in _$(call ...)_ change ndncxx to ndncert.
+
+5. What we want is using Zhiyi's tool(ndncert-client), thus there isn't much coding here. Put _ClientTool_ he defined in ndncert-client.cpp into our code is sufficient.
+
+6. However, you much change every getline() to a new function. What we want here is not getline, but to prompt a window and ask the user to imput something, so I have defined a getline() myself. 
+You may need a [dialog](https://developer.android.com/guide/topics/ui/dialogs) for user input. [This](https://www.viralandroid.com/2016/04/android-user-input-dialog-example.html) seems to be a good tutorial for create dialogs, I haven't read it carefully yet.

@@ -51,6 +51,11 @@
     <string name="tags_if_taken"></string>
     <string name="tags_id_name"></string>
 
+    <string name="author">Author: Peter</string>
+    <string name="legal_info">This is some legal info that you will never read.</string>
+    <string name="id_name">Please specify identity name:</string>
+    <string name="secret">Please give me the secret you have:</string>
+    <string name="select_challenge">Please select the challenge you want:</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

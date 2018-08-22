@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 traceApplications((String)fab.getTag(R.string.tags_id_name));
             }
         } else {
-            Intent intent = new Intent(this, GenerateToken.class);
+            Intent intent = new Intent(this, NdncertClient.class);
             startActivity(intent);
         }
     }

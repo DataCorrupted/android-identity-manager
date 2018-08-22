@@ -5,24 +5,22 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Open mHealth Namespace"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="127dp"
+        android:text="@string/author"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="178dp" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/legalInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Terms of service: Something
-Author: Peter"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerVertical="true"
+        android:text="@string/legal_info"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -37,24 +35,24 @@ Author: Peter"
         android:layout_alignParentStart="true">
 
         <Button
-            android:id="@+id/buttonDecline"
+            android:id="@+id/buttonPrev"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="@string/button_decline"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:layout_weight="1"
-            android:onClick="declineClick" />
+            android:onClick="goToMainPage" />
 
         <Button
-            android:id="@+id/buttonAccept"
+            android:id="@+id/buttonNext"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="@string/button_accept"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:layout_weight="1"
-            android:onClick="tab1Click" />
+            android:onClick="goToNextTab" />
 
     </LinearLayout>
 

@@ -22,17 +22,13 @@ public class UICreateIDPageAdapter extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-                UICreateOpenmHealthIDInfo tab0 = new UICreateOpenmHealthIDInfo();
-                return tab0;
+                return new UICreateShowLegalInfo();
             case 1:
-                UICreateOpenmHealthIDInputDialog tab1 = new UICreateOpenmHealthIDInputDialog();
-                return tab1;
+                return new UICreateInputIdName();
             case 2:
-                UICreateOpenmHealthIDPictureSelect tab2 = new UICreateOpenmHealthIDPictureSelect();
-                return tab2;
+                return new UICreateSelectChallenge();
             case 3:
-                UICreateOpenmHealthIDRequestSent tab3 = UICreateOpenmHealthIDRequestSent.newInstance(mHintText, mDisableExtra);
-                return tab3;
+                return new UICreateInputSecret();
             default:
                 return null;
         }

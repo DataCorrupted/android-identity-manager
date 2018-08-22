@@ -32,6 +32,11 @@
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
         </activity>
         <activity
+            android:name=".NdncertClient"
+            android:label="NdncertClient"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
+        </activity>
+        <activity
             android:name=".GenerateIdentity"
             android:label="@string/title_activity_generate_identity"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >

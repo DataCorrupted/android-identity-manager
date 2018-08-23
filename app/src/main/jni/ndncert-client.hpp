@@ -81,7 +81,7 @@ JNIEXPORT jstring JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_init
  * Signature: ([Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendNew
-  (JNIEnv *, jclass, jobjectArray);
+  (JNIEnv *, jobject, jobjectArray);
 
 #ifdef __cplusplus
 }

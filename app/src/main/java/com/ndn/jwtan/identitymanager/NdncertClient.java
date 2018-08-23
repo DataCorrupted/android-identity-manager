@@ -20,8 +20,12 @@ public class NdncertClient extends AppCompatActivity {
     }
 
     static public native String init();
-    static public native void cppSendNew(String[] s);
-
+    public native void cppSendNew(String[] s);
+    static public void cppSendSelect(String[] s){
+        for(String str: s){
+            Log.e("NdncertClient: ", str);
+        }
+    }
     private interface Callback{
         void call(String[] s);
     }
@@ -30,6 +34,13 @@ public class NdncertClient extends AppCompatActivity {
         @Override
         public void call(String[] s) {
             cppSendNew(s);
+        }
+    };
+
+    Callback sendSelect = new Callback() {
+        @Override
+        public void call(String[] s) {
+            cppSendSelect(s);
         }
     };
 

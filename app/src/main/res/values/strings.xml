@@ -56,6 +56,12 @@
     <string name="id_name">Please specify identity name:</string>
     <string name="secret">Please give me the secret you have:</string>
     <string name="select_challenge">Please select the challenge you want:</string>
+
+    <string name="button_enter">Enter</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="generic_prompt">Peter: Please input something.</string>
+    <string name="valid_input">We got your input!</string>
+    <string name="empty_input">Please fill in the empty!</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

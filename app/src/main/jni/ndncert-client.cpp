@@ -1,6 +1,8 @@
 //
 // Created by peter on 8/7/18.
 //
+#include <android/log.h>
+
 #include "ndncert-client.hpp"
 
 #include "client-module.hpp"
@@ -207,24 +209,75 @@ public:
 } // namespace ndncert
 } // namespace ndn
 
-// TODO: We can treat this as a member function of ClientTool and put env as a member.
-std::string getUserInputLine(JNIEnv * env, std::string info){
-
-    jstring info_jstr = env->NewStringUTF(info.c_str());
-
-    // TODO: UserInput not existed yet.
-    jclass clazz = env->FindClass("com/ndn/jwtan/identitymanager/UserInput");
-
-    jmethodID getLine = env->GetMethodID(clazz, "getLine", "()Lcom/ndn/jwtan/identitymanager/UserInput;");
-
-    jobject result = env->CallObjectMethod(info_jstr, getLine);
-
-    const char* str = env->GetStringUTFChars((jstring) result, nullptr);
-
-    return str;
+std::list<std::string> jStrArr2CppStrList(JNIEnv* env, jobjectArray arr){
+    std::list<std::string> cppStrList;
+    int strCnt = env->GetArrayLength(arr);
+    for (int i=0; i<strCnt; i++){
+        jstring tmpJStr = (jstring) env->GetObjectArrayElement(arr, i);
+        cppStrList.add(std::string(env->GetStringUTFChars(tmpJStr, nullptr)));
+    }
+    return cppStrList;
 }
 
+jobjectArray cppStrList2JStrArr(JNIEnv* env, std::list<std::string> arr){
+    jclass strClass = env->FindClass("java/lang/String");
+    jobjectArray jStrArr = env->NewObjectArray(arr.size(), strClass);
+    for (int i=0; i<arr.size(); i++){
+        std::string tmp = env->NewStringUTF(arr[i].c_str());
+        env->SetObjectArrayElement(jStrArr, i, tmp);
+    }
+    return jStrArr;
+}
+/*
+ * Class:     com_ndn_jwtan_identitymanager_NdncertClient
+ * Method:    cppSendNew
+ * Signature: ([Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendNew
+  (JNIEnv * env, jclass obj, jobjectArray arr){
+    auto strList = jStrArr2CppStrList(env, arr);
+
+    // Do something.
+
+    auto textList = std::list<std::string>();
+    auto hintList = std::list<std::string>();
+
+    // Get info that are required, put them in list.
+
+    // Prepare all the args.
+    jobjectArray textJArr = cppStrList2JStrArr(textList);
+    jobjectArray hintJArr = cppStrList2JStrArr(hintList);
+    jobject cb;
+
+    // Call next function.
+    jclass cls = env->GetObejctClass(obj);
+    jmethodID promptInputDialog = env->GetMethodID(
+        cls, "promptInputDialog",
+        "([Ljava/lang/String;[Ljava/lang/String;com/ndn/jwtan/identitymanager/NdncertClient/Callback)[Ljava/lang/String");
+    jobject result = env->CallObjectMethod(cls, promptInputDialog, textJarr, hintJarr, cb);
+
+
+}
+
+
+JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_startNdncertClient
+  (JNIEnv * env, jclass obj){
+    std::cerr << "This works\n";
+    jstring prompt = env->NewStringUTF("Please input your email:");
+    jstring hint = env->NewStringUTF("PeterRong96@gmail.com");
+    jclass cls = env->GetObjectClass(obj);
+    jmethodID getLine = env->GetMethodID(cls, "getLine", "(Ljava/lang/String;Ljava/lang/String)Ljava/lang/String");
+    jstring result = (jstring) env->CallObjectMethod(cls, getLine, prompt, hint);
+    std::string str = std::string(env->GetStringUTFChars(result, nullptr));
+    std::cerr << str << "\n";
+}
+
+/*
+ * Class:     com_ndn_jwtan_identitymanager_NdncertClient
+ * Method:    init
+ * Signature: ()Ljava/lang/String;
+ */
 JNIEXPORT jstring JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_init
-        (JNIEnv * env, jclass obj){
+  (JNIEnv * env, jclass obj){
     return env->NewStringUTF("JNI init succeeded");
 }

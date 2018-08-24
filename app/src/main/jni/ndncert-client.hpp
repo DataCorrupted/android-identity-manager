@@ -77,10 +77,42 @@ JNIEXPORT jstring JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_init
 
 /*
  * Class:     com_ndn_jwtan_identitymanager_NdncertClient
+ * Method:    startNdncertClient
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_startNdncertClient
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_ndn_jwtan_identitymanager_NdncertClient
  * Method:    cppSendNew
  * Signature: ([Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendNew
+  (JNIEnv *, jobject, jobjectArray);
+
+/*
+ * Class:     com_ndn_jwtan_identitymanager_NdncertClient
+ * Method:    cppSendSelect
+ * Signature: ([Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendSelect
+  (JNIEnv *, jobject, jobjectArray);
+
+/*
+ * Class:     com_ndn_jwtan_identitymanager_NdncertClient
+ * Method:    cppSendValidate
+ * Signature: ([Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendValidate
+  (JNIEnv *, jobject, jobjectArray);
+
+/*
+ * Class:     com_ndn_jwtan_identitymanager_NdncertClient
+ * Method:    cppDownload
+ * Signature: ([Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppDownload
   (JNIEnv *, jobject, jobjectArray);
 
 #ifdef __cplusplus

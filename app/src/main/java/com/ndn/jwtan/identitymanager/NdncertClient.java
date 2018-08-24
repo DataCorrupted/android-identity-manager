@@ -20,33 +20,40 @@ public class NdncertClient extends AppCompatActivity {
     }
 
     static public native String init();
+    public native void startNdncertClient();
     public native void cppSendNew(String[] s);
-    static public void cppSendSelect(String[] s){
-        for(String str: s){
-            Log.e("NdncertClient: ", str);
-        }
-    }
+    public native void cppSendSelect(String[] s);
+    public native void cppSendValidate(String[] s);
+    public native void cppDownload(String[] s);
+
     private interface Callback{
         void call(String[] s);
     }
-
     Callback sendNew = new Callback() {
         @Override
         public void call(String[] s) {
             cppSendNew(s);
         }
     };
-
     Callback sendSelect = new Callback() {
         @Override
         public void call(String[] s) {
-            cppSendSelect(s);
+            cppSendValidate(s);
+        }
+    };
+    Callback download = new Callback() {
+        @Override
+        public void call(String[] s) {
+            cppDownload(s);
         }
     };
 
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
+
+        startNdncertClient();
+
         setContentView(R.layout.fragment_uicreate_show_legal_info);
         Button btnAccept = findViewById(R.id.buttonAccept);
         btnAccept.setOnClickListener(new View.OnClickListener() {

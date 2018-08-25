@@ -14,13 +14,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class NdncertClient extends AppCompatActivity {
     static{
         System.loadLibrary("ndncert-client");
     }
 
+    private HashMap<String, String> params = new HashMap<>();
+
     static public native String init();
-    public native void startNdncertClient();
+    public native void startNdncertClient(Map<String, String> params);
     public native void cppSendNew(String[] s);
     public native void cppSelectChallenge(String[] s);
     public native void cppSendSelect(String[] s);
@@ -64,7 +69,9 @@ public class NdncertClient extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
-        startNdncertClient();
+
+        params.put("HOME", this.getFilesDir().getAbsolutePath());
+        startNdncertClient(params);
 
         setContentView(R.layout.fragment_uicreate_show_legal_info);
         Button btnAccept = findViewById(R.id.buttonAccept);

@@ -30,6 +30,48 @@ void selectCb(const shared_ptr<RequestState>& requestState, JNIEnv* env, jobject
 void validateCb(const shared_ptr<RequestState>& requestState, JNIEnv* env, jobject obj);
 void downloadCb(const shared_ptr<RequestState>& requestState, JNIEnv* env, jobject obj);
 
+// Helper function copied from Alex.
+// Turns a java Map<String, String>
+// to cpp std::map<std::string, std::string>
+std::map<std::string, std::string>
+getParams(JNIEnv* env, jobject jParams){
+  std::map<std::string, std::string> params;
+
+    jclass jcMap = env->GetObjectClass(jParams);
+    jclass jcSet = env->FindClass("java/util/Set");
+    jclass jcIterator = env->FindClass("java/util/Iterator");
+    jclass jcMapEntry = env->FindClass("java/util/Map$Entry");
+
+    jmethodID jcMapEntrySet      = env->GetMethodID(jcMap,      "entrySet", "()Ljava/util/Set;");
+    jmethodID jcSetIterator      = env->GetMethodID(jcSet,      "iterator", "()Ljava/util/Iterator;");
+    jmethodID jcIteratorHasNext  = env->GetMethodID(jcIterator, "hasNext",  "()Z");
+    jmethodID jcIteratorNext     = env->GetMethodID(jcIterator, "next",     "()Ljava/lang/Object;");
+    jmethodID jcMapEntryGetKey   = env->GetMethodID(jcMapEntry, "getKey",   "()Ljava/lang/Object;");
+    jmethodID jcMapEntryGetValue = env->GetMethodID(jcMapEntry, "getValue", "()Ljava/lang/Object;");
+
+    jobject jParamsEntrySet = env->CallObjectMethod(jParams, jcMapEntrySet);
+    jobject jParamsIterator = env->CallObjectMethod(jParamsEntrySet, jcSetIterator);
+    jboolean bHasNext = env->CallBooleanMethod(jParamsIterator, jcIteratorHasNext);
+    while (bHasNext) {
+        jobject entry = env->CallObjectMethod(jParamsIterator, jcIteratorNext);
+
+        jstring jKey = (jstring)env->CallObjectMethod(entry, jcMapEntryGetKey);
+        jstring jValue = (jstring)env->CallObjectMethod(entry, jcMapEntryGetValue);
+
+        const char* cKey = env->GetStringUTFChars(jKey, nullptr);
+        const char* cValue = env->GetStringUTFChars(jValue, nullptr);
+
+        params.insert(std::make_pair(cKey, cValue));
+
+        env->ReleaseStringUTFChars(jKey, cKey);
+        env->ReleaseStringUTFChars(jValue, cValue);
+
+        bHasNext = env->CallBooleanMethod(jParamsIterator, jcIteratorHasNext);
+    }
+    return params;
+}
+
+
 std::list<std::string> jStrArr2CppStrList(JNIEnv* env, jobjectArray arr){
     std::list<std::string> cppStrList;
     int strCnt = env->GetArrayLength(arr);
@@ -93,20 +135,21 @@ JNIEXPORT jstring JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_init
 /*
  * Class:     com_ndn_jwtan_identitymanager_NdncertClient
  * Method:    startNdncertClient
- * Signature: ()V
+ * Signature: (Ljava/util/Map;)V
  */
 JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_startNdncertClient
-  (JNIEnv * env, jobject obj){
-    boost::filesystem::path path = boost::filesystem::current_path();
+  (JNIEnv * env, jobject obj, jobject jParams){
+    std::map<std::string, std::string> params = getParams(env, jParams);
+    ::setenv("HOME", params["HOME"].c_str(), true);
+    Face face;
+    security::v2::KeyChain keyChain;
+    mClient = new ClientModule(face, keyChain);
     __android_log_print(
-            ANDROID_LOG_ERROR,
-            "ndncert-client.cpp: ",
-            "%s", path.string().c_str());
-    // Face face;
-    //security::v2::KeyChain keyChain;
-    // mClient = new ClientModule(face, keyChain);
-    // TODO: Give a clear filepath, I actually wanted a hardcoded one.
-    // mClient->getClientConf().load("FilePath");
+                ANDROID_LOG_ERROR,
+                "ndncert-client.cpp: ",
+                "Finally I had a working ClientModule.");
+
+    //mClient->getClientConf().load("FilePath");
 }
 
 /*

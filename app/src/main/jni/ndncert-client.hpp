@@ -78,10 +78,10 @@ JNIEXPORT jstring JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_init
 /*
  * Class:     com_ndn_jwtan_identitymanager_NdncertClient
  * Method:    startNdncertClient
- * Signature: ()V
+ * Signature: (Ljava/util/Map;)V
  */
 JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_startNdncertClient
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jobject);
 
 /*
  * Class:     com_ndn_jwtan_identitymanager_NdncertClient

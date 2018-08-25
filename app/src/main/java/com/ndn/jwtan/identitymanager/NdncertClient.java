@@ -22,6 +22,7 @@ public class NdncertClient extends AppCompatActivity {
     static public native String init();
     public native void startNdncertClient();
     public native void cppSendNew(String[] s);
+    public native void cppSelectChallenge(String[] s);
     public native void cppSendSelect(String[] s);
     public native void cppSendValidate(String[] s);
     public native void cppDownload(String[] s);
@@ -35,7 +36,19 @@ public class NdncertClient extends AppCompatActivity {
             cppSendNew(s);
         }
     };
+    Callback selectChallenge = new Callback() {
+        @Override
+        public void call(String[] s) {
+            cppSelectChallenge(s);
+        }
+    };
     Callback sendSelect = new Callback() {
+        @Override
+        public void call(String[] s) {
+            cppSendSelect(s);
+        }
+    };
+    Callback sendValidate = new Callback() {
         @Override
         public void call(String[] s) {
             cppSendValidate(s);
@@ -51,7 +64,6 @@ public class NdncertClient extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
-
         startNdncertClient();
 
         setContentView(R.layout.fragment_uicreate_show_legal_info);
@@ -88,15 +100,15 @@ public class NdncertClient extends AppCompatActivity {
         assert texts.length == hints.length;
         int requestCnt = texts.length;
         editTexts = new EditText[requestCnt];
-        LinearLayout layout = new LinearLayout(this);
+        LinearLayout layout = new LinearLayout(NdncertClient.this);
         layout.setOrientation(LinearLayout.VERTICAL);
         for (int i=0; i<requestCnt; i++){
-            TextView tempTv = new TextView(this);
+            TextView tempTv = new TextView(NdncertClient.this);
             tempTv.setText(texts[i]);
             tempTv.setTextAppearance(R.style.TextAppearance_AppCompat_Large);
             layout.addView(tempTv);
 
-            EditText tempEt = new EditText(this);
+            EditText tempEt = new EditText(NdncertClient.this);
             tempEt.setHint(hints[i]);
             tempEt.setMaxLines(1);
             tempEt.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -146,5 +158,17 @@ public class NdncertClient extends AppCompatActivity {
 
         // Woola, you have your dialog.
         dialog.show();
+    }
+    private void promptSelectDialog(String[] texts, final String[] hints, final Callback cb){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(NdncertClient.this);
+        mBuilder.setTitle(texts[0])
+                .setItems(hints, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String[] choice = new String[1];
+                        choice[0] = hints[i];
+                        cb.call(choice);
+                    }
+                }).create().show();
     }
 }

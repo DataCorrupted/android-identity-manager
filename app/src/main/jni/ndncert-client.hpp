@@ -93,6 +93,14 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendN
 
 /*
  * Class:     com_ndn_jwtan_identitymanager_NdncertClient
+ * Method:    cppSelectChallenge
+ * Signature: ([Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSelectChallenge
+  (JNIEnv *, jobject, jobjectArray);
+
+/*
+ * Class:     com_ndn_jwtan_identitymanager_NdncertClient
  * Method:    cppSendSelect
  * Signature: ([Ljava/lang/String;)V
  */

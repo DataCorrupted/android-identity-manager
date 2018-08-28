@@ -30,7 +30,6 @@ public class NdncertClient extends AppCompatActivity {
     public native void cppSelectChallenge(String[] s);
     public native void cppSendSelect(String[] s);
     public native void cppSendValidate(String[] s);
-    public native void cppDownload(String[] s);
 
     private interface Callback{
         void call(String[] s);
@@ -59,18 +58,16 @@ public class NdncertClient extends AppCompatActivity {
             cppSendValidate(s);
         }
     };
-    Callback download = new Callback() {
-        @Override
-        public void call(String[] s) {
-            cppDownload(s);
-        }
-    };
+    // Just a place holder, we will never call this functions.
+    Callback download = null;
 
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
 
+        String confPath = this.getFilesDir().getAbsolutePath() + "ca-client.conf"
         params.put("HOME", this.getFilesDir().getAbsolutePath());
+        params.put("CONF", );
         startNdncertClient(params);
 
         setContentView(R.layout.fragment_uicreate_show_legal_info);
@@ -177,5 +174,24 @@ public class NdncertClient extends AppCompatActivity {
                         cb.call(choice);
                     }
                 }).create().show();
+    }
+    private void promptFinishDialog(String[] texts, String[] hints, final Callback cb){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(NdncertClient.this);
+        mBuilder.setTitle("Congratulations!")
+                .setPositiveButton("Acknowleged", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivity(new Intent(NdncertClient.this, MainActivity.class));
+                    }
+                });
+        LinearLayout layout = new LinearLayout(NdncertClient.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        TextView tv = new TextView(NdncertClient.this);
+        tv.setText(R.string.congratulations);
+        tv.setTextAppearance(R.style.TextAppearance_AppCompat_Large);
+        layout.addView(tv);
+        mBuilder.setView(layout);
+        dialog = mBuilder.create();
+        dialog.show();
     }
 }

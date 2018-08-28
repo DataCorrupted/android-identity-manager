@@ -7,6 +7,7 @@
 
 #include "client-module.hpp"
 #include "challenge-module.hpp"
+#include "config.cpp"
 
 #include <iostream>
 #include <string>
@@ -19,7 +20,7 @@ using namespace ndn::ndncert;
 static ClientModule* mClient;
 static shared_ptr<RequestState> mState;
 
-void errorCb(const std::string& errorInfo){
+void errorCb(const std::string& errorInfo, JNIEnv* env, jobject obj){
      __android_log_print(
         ANDROID_LOG_ERROR,
         "ndncert-client.cpp: ",
@@ -144,12 +145,12 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_startNdn
     Face face;
     security::v2::KeyChain keyChain;
     mClient = new ClientModule(face, keyChain);
+    mClient->getClientConf().load(getConfig());
     __android_log_print(
                 ANDROID_LOG_ERROR,
                 "ndncert-client.cpp: ",
                 "Finally I had a working ClientModule.");
 
-    //mClient->getClientConf().load("FilePath");
 }
 
 /*
@@ -168,7 +169,7 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendN
     /*mClient->sendNew(
         clientCaItem, identityName,
         std::bind(&newCb, _1, env, obj),
-        errorCb);*/
+        std::bind(&errorCb, _1, env, obj));*/
     // TODO: fake server below.
     mState = make_shared<RequestState>();
     mState->m_challengeList = std::list<std::string>({"Email", "PIN", "SMS"});
@@ -218,7 +219,7 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendS
     /*client->sendSelect(
         mState, paramList.front(), paramJson,
         std::bind(&selectCb, _1, env, obj),
-        errorCb);*/
+        std::bind(&errorCb, _1, env, obj));*/
     // TODO: fake server below.
     mState->m_challengeType = choice;
     mState->m_status = "need-code";
@@ -240,7 +241,7 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendS
     client->sendSelect(
         mState, paramList.front(), paramJson,
         std::bind(&selectCb, _1, env, obj),
-        errorCb);
+        std::bind(&errorCb, _1, env, obj));
     // TODO: fake server below.
     mState->m_challengeType = "Email";
     mState->m_status = "need-code";
@@ -275,7 +276,7 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendV
     /*client->sendValidate(
         mState, paramJson,
         std::bind(validateCb&, _1, env, obj),
-        errorCb);*/
+        std::bind(&errorCb, _1, env, obj));*/
     // TODO: fake server below.
     if (paramList.front() == "961030"){
         mState->m_status = ChallengeModule::SUCCESS;
@@ -295,8 +296,8 @@ void validateCb(
             "DONE! Certificate has already been issued \n");
         /*client->requestDownload(mState,
                              bind(downloadCb, _1, env, obj),
-                             errorCb);*/
-        return;
+                             std::bind(&errorCb, _1, env, obj));*/
+        downloadCb(mState, env, obj);
     } else {
         auto challenge = ChallengeModule::createChallengeModule(mState->m_challengeType);
         auto requirementList = challenge->getRequirementForValidate(mState->m_status);
@@ -309,6 +310,23 @@ void validateCb(
     }
 }
 
+void downloadCb(
+    const shared_ptr<RequestState>& requestState,
+    JNIEnv* env, jobject obj){
+    mState = requestState;
+
+    __android_log_print(
+        ANDROID_LOG_ERROR,
+        "ndncert-client.cpp: ",
+        "DONE! Certificate has already been installed to local keychain\n");
+
+    auto textList = std::list<std::string>({"empty"});
+    auto hintList = std::list<std::string>({"empty"});
+
+    // Call next function.
+    callJavaFunction(env, obj, "promptFinishDialog", "download", textList, hintList);
+}
+
 /*
  * Class:     com_ndn_jwtan_identitymanager_NdncertClient
  * Method:    cppDownload
@@ -316,6 +334,5 @@ void validateCb(
  */
 JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppDownload
   (JNIEnv * env, jobject obj, jobjectArray arr){
-    // TODO: Create a TextView to inform that the idendity has been created.
-    __android_log_print(ANDROID_LOG_ERROR, "TRACKERS", "%s", "Succeeded.");
+    __android_log_print(ANDROID_LOG_ERROR, "TRACKERS", "%s", "Prompt done.");
 }

@@ -65,9 +65,7 @@ public class NdncertClient extends AppCompatActivity {
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
 
-        String confPath = this.getFilesDir().getAbsolutePath() + "ca-client.conf"
         params.put("HOME", this.getFilesDir().getAbsolutePath());
-        params.put("CONF", );
         startNdncertClient(params);
 
         setContentView(R.layout.fragment_uicreate_show_legal_info);
@@ -94,6 +92,11 @@ public class NdncertClient extends AppCompatActivity {
     private EditText[] editTexts;
     private AlertDialog dialog;
     private void promptInputDialog(String[] texts, String[] hints, final Callback cb){
+        // No need to create this dialog if there is nothing to input.
+        if (texts.length == 0) {
+            cb.call(new String[0]);
+            return;
+        }
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(NdncertClient.this);
         // We will set them up when the dialog is shown.
         mBuilder.setPositiveButton(R.string.button_enter, null)
@@ -175,10 +178,10 @@ public class NdncertClient extends AppCompatActivity {
                     }
                 }).create().show();
     }
-    private void promptFinishDialog(String[] texts, String[] hints, final Callback cb){
+    private void promptTextDialog(String title, String text){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(NdncertClient.this);
-        mBuilder.setTitle("Congratulations!")
-                .setPositiveButton("Acknowleged", new DialogInterface.OnClickListener() {
+        mBuilder.setTitle(title)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         startActivity(new Intent(NdncertClient.this, MainActivity.class));
@@ -187,11 +190,10 @@ public class NdncertClient extends AppCompatActivity {
         LinearLayout layout = new LinearLayout(NdncertClient.this);
         layout.setOrientation(LinearLayout.VERTICAL);
         TextView tv = new TextView(NdncertClient.this);
-        tv.setText(R.string.congratulations);
+        tv.setText(text);
         tv.setTextAppearance(R.style.TextAppearance_AppCompat_Large);
         layout.addView(tv);
         mBuilder.setView(layout);
         dialog = mBuilder.create();
         dialog.show();
-    }
-}
+    }}

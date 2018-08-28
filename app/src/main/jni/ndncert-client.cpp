@@ -20,11 +20,23 @@ using namespace ndn::ndncert;
 static ClientModule* mClient;
 static shared_ptr<RequestState> mState;
 
+void callJavaTextDialog(
+  JNIEnv* env, jobject obj,
+  std::string title, std::string text){
+     jstring jTitle = env->NewStringUTF(title.c_str());
+     jstring jText = env->NewStringUTF(text.c_str());
+     jclass cls = env->FindClass("com/ndn/jwtan/identitymanager/NdncertClient");
+     jmethodID promptTextDialog = env->GetMethodID(
+         cls, "promptTextDialog", "(Ljava/lang/String;Ljava/lang/String;)V");
+     env->CallVoidMethod(obj, promptTextDialog, jTitle, jText);
+}
+
 void errorCb(const std::string& errorInfo, JNIEnv* env, jobject obj){
-     __android_log_print(
+    __android_log_print(
         ANDROID_LOG_ERROR,
         "ndncert-client.cpp: ",
         "%s", errorInfo.c_str());
+    callJavaTextDialog(env, obj, "Error!", errorInfo);
 }
 void newCb(const shared_ptr<RequestState>& requestState, JNIEnv* env, jobject obj);
 void selectCb(const shared_ptr<RequestState>& requestState, JNIEnv* env, jobject obj);
@@ -170,6 +182,7 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendN
         clientCaItem, identityName,
         std::bind(&newCb, _1, env, obj),
         std::bind(&errorCb, _1, env, obj));*/
+
     // TODO: fake server below.
     mState = make_shared<RequestState>();
     mState->m_challengeList = std::list<std::string>({"Email", "PIN", "SMS"});
@@ -225,28 +238,6 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendS
     mState->m_status = "need-code";
     selectCb(mState, env, obj);
 }
-
-/*
- * Class:     com_ndn_jwtan_identitymanager_NdncertClient
- * Method:    selectChallenge
- * Signature: ([Ljava/lang/String;)V
- */
-/*JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_selectChallenge
-  (JNIEnv * env, jobject obj, jobjectArray arr){
-    // Get input in the form of List<String>
-    auto paramList = jStrArr2CppStrList(env, arr);
-    auto challenge = ChallengeModule::createChallengeModule(paramList.front());
-    // TODO: ask for more info, for example: email address.
-    auto paramJson = challenge->genSelectParamsJson(mState->m_status, paramList);
-    client->sendSelect(
-        mState, paramList.front(), paramJson,
-        std::bind(&selectCb, _1, env, obj),
-        std::bind(&errorCb, _1, env, obj));
-    // TODO: fake server below.
-    mState->m_challengeType = "Email";
-    mState->m_status = "need-code";
-    selectCb(mState, env, obj);
-}*/
 void selectCb(
   const shared_ptr<RequestState>& requestState,
   JNIEnv* env, jobject obj){
@@ -320,19 +311,8 @@ void downloadCb(
         "ndncert-client.cpp: ",
         "DONE! Certificate has already been installed to local keychain\n");
 
-    auto textList = std::list<std::string>({"empty"});
-    auto hintList = std::list<std::string>({"empty"});
-
-    // Call next function.
-    callJavaFunction(env, obj, "promptFinishDialog", "download", textList, hintList);
-}
-
-/*
- * Class:     com_ndn_jwtan_identitymanager_NdncertClient
- * Method:    cppDownload
- * Signature: ([Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppDownload
-  (JNIEnv * env, jobject obj, jobjectArray arr){
-    __android_log_print(ANDROID_LOG_ERROR, "TRACKERS", "%s", "Prompt done.");
+    // Call text function.
+    callJavaTextDialog(
+        env, obj, "Congratulations!",
+        "You certificate has already been installed to local keychain.");
 }

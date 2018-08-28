@@ -115,14 +115,6 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendS
 JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendValidate
   (JNIEnv *, jobject, jobjectArray);
 
-/*
- * Class:     com_ndn_jwtan_identitymanager_NdncertClient
- * Method:    cppDownload
- * Signature: ([Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppDownload
-  (JNIEnv *, jobject, jobjectArray);
-
 #ifdef __cplusplus
 }
 #endif

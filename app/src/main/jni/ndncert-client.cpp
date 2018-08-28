@@ -175,19 +175,21 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendN
     // Get input in the form of List<String>
     auto paramList = jStrArr2CppStrList(env, arr);
 
-    ClientCaItem clientCaItem;
+    auto caList = mClient->getClientConf().m_caItems;
+    std::vector<ClientCaItem> caVec{std::begin(caList), std::end(caList)};
+    ClientCaItem clientCaItem = caVec[0];
     Name identityName = clientCaItem.m_caName.getPrefix(-1);
     identityName.append(paramList.front());
-    /*mClient->sendNew(
+    mClient->sendNew(
         clientCaItem, identityName,
         std::bind(&newCb, _1, env, obj),
-        std::bind(&errorCb, _1, env, obj));*/
+        std::bind(&errorCb, _1, env, obj));
 
     // TODO: fake server below.
-    mState = make_shared<RequestState>();
+    /*mState = make_shared<RequestState>();
     mState->m_challengeList = std::list<std::string>({"Email", "PIN", "SMS"});
     mState->m_status = "Select";
-    newCb(mState, env, obj);
+    newCb(mState, env, obj);*/
 }
 void newCb(
   const shared_ptr<RequestState>& requestState,

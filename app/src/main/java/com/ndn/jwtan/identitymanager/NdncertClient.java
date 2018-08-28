@@ -100,7 +100,8 @@ public class NdncertClient extends AppCompatActivity {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(NdncertClient.this);
         // We will set them up when the dialog is shown.
         mBuilder.setPositiveButton(R.string.button_enter, null)
-                .setNegativeButton(R.string.button_cancel, null);
+                .setNegativeButton(R.string.button_cancel, null)
+                .setCancelable(false);
 
         // Setup dialog view.
         // Including all the input boxes and hints.
@@ -150,7 +151,11 @@ public class NdncertClient extends AppCompatActivity {
                                 R.string.valid_input,
                                 Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
-                        cb.call(inputs);
+                        try{
+                            cb.call(inputs);
+                        } catch (Exception e){
+                            Log.e("NDNCert: ", e.getMessage());
+                        }
                     }
                 });
                 Button btnCancel = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
@@ -169,6 +174,7 @@ public class NdncertClient extends AppCompatActivity {
     private void promptSelectDialog(String[] texts, final String[] hints, final Callback cb){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(NdncertClient.this);
         mBuilder.setTitle(texts[0])
+                .setCancelable(false)
                 .setItems(hints, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -181,6 +187,7 @@ public class NdncertClient extends AppCompatActivity {
     private void promptTextDialog(String title, String text){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(NdncertClient.this);
         mBuilder.setTitle(title)
+                .setCancelable(false)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

@@ -7,11 +7,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.util.Log;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,16 +45,30 @@ public class MainActivity extends AppCompatActivity {
         Log.e("zhehao", usage);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.identity_list);
 
-        //getIdentities();
+        // Get your id list.
+        final String[] idNames = getIdentities();
+        ListView listView = findViewById(R.id.identity_list);
+        ArrayAdapter adapter = new ArrayAdapter<String>(this,
+                R.layout.identity_entry, idNames);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(MainActivity.this, ShowIdentity.class);
+                // Present identity name to next activity.
+                intent.putExtra("identityName", idNames[(int) l]);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
         Log.e("zhehao", "on resume");
-        getIdentities();
+        // getIdentities();
     }
 
     @Override
@@ -71,24 +93,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /** Called when the user clicks the generate a new identity button */
-    public void generateOrViewIdentity(View view) {
-        FloatingActionButton fab = (FloatingActionButton) view;
-        if (fab.getTag(R.string.tags_if_taken) == slotTaken) {
-            if (usage.equals("authorize")) {
-                //authorizeApp((String) fab.getTag(R.string.tags_id_name));
-                Intent resultIntent = new Intent();
-                // Although we have a device ID, the user ID is used to sign app ID
-                resultIntent.putExtra("prefix", (String) fab.getTag(R.string.tags_id_name));
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
-            } else {
-                traceApplications((String)fab.getTag(R.string.tags_id_name));
-            }
-        } else {
-            Intent intent = new Intent(this, NdncertClient.class);
-            startActivity(intent);
-        }
+    public void newIdentity(View view){
+        Intent intent = new Intent(MainActivity.this, NdncertClient.class);
+        startActivity(intent);
     }
 
     // Always exit the application when back is pressed for Main activity,
@@ -101,67 +108,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // Although we have a device ID, the user ID is used to sign app ID
-    public void getIdentities() {
-        // Establish Database connection
-        DataBaseHelper dbHelper = new DataBaseHelper(this);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        // How you want the results sorted in the resulting Cursor
-        String sortOrder =
-                DataBaseSchema.IdentityEntry.COLUMN_NAME_IDENTITY + " DESC";
-
-        String[] projection = {
-                DataBaseSchema.IdentityEntry._ID,
-                DataBaseSchema.IdentityEntry.COLUMN_NAME_CAPTION,
-                DataBaseSchema.IdentityEntry.COLUMN_NAME_PICTURE,
-                DataBaseSchema.IdentityEntry.COLUMN_NAME_IDENTITY
-        };
-
-        String[] whereClause = {
-                "1"
-        };
-
-        Cursor c = db.query(
-                DataBaseSchema.IdentityEntry.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                DataBaseSchema.IdentityEntry.COLUMN_NAME_APPROVED + "=?",                                     // The columns for the WHERE clause
-                whereClause,                              // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
-
-        Integer idx = 0;
-        // temporary maxIdx for static layout
-        int maxIdx = 6;
-        while (c.moveToNext() && idx < maxIdx) {
-            String tvId = "tv" + idx.toString();
-            TextView tv = (TextView) this.findViewById(getResources().getIdentifier(tvId, "id", getPackageName()));
-            tv.setText(c.getString(1));
-            String fabId = "fab" + idx.toString();
-            FloatingActionButton fab = (FloatingActionButton) this.findViewById(getResources().getIdentifier(fabId, "id", getPackageName()));
-            if (c.getString(2) != "") {
-                fab.setImageResource(getResources().getIdentifier(c.getString(2), "drawable", getPackageName()));
-            }
-            fab.setTag(R.string.tags_if_taken, slotTaken);
-            fab.setTag(R.string.tags_id_name, c.getString(3));
-            idx += 1;
-        }
-
-        c.close();
-        db.close();
-    }
-
-    public void traceApplications(String idName) {
-        Intent intent = new Intent(this, DisplayApps.class);
-        intent.putExtra(DisplayApps.EXTRA_MESSAGE_IDENTITY, idName);
-        startActivity(intent);
-    }
-
-    /** Called when the user clicks the trace all identities button */
-    public void traceIdentities(View view) {
-        Intent intent = new Intent(this, DisplayIdentities.class);
-        startActivity(intent);
+    public String[] getIdentities(){
+        // TODO: Get id list from HOME/.ndn/
+        //String[] identities = {"PeterRong", "JiaweiLing"};
+        //identities = new String[0];
+        //return identities;
+        return new String[0];
     }
 }

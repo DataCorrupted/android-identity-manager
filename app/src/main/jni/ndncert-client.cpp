@@ -14,11 +14,18 @@
 #include <boost/filesystem.hpp>
 #include <ndn-cxx/security/verification-helpers.hpp>
 
+#ifndef NDNCERT_CLIENT_TAG
+#define NDNCERT_CLIENT_TAG "nencert-client.cpp: "
+#endif
+
 using namespace ndn;
 using namespace ndn::ndncert;
 
 static ClientModule* mClient;
 static shared_ptr<RequestState> mState;
+static Face* mFace;
+static security::v2::KeyChain* mKeyChain;
+
 
 void callJavaTextDialog(
   JNIEnv* env, jobject obj,
@@ -34,7 +41,7 @@ void callJavaTextDialog(
 void errorCb(const std::string& errorInfo, JNIEnv* env, jobject obj){
     __android_log_print(
         ANDROID_LOG_ERROR,
-        "ndncert-client.cpp: ",
+        NDNCERT_CLIENT_TAG,
         "%s", errorInfo.c_str());
     callJavaTextDialog(env, obj, "Error!", errorInfo);
 }
@@ -154,15 +161,14 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_startNdn
   (JNIEnv * env, jobject obj, jobject jParams){
     std::map<std::string, std::string> params = getParams(env, jParams);
     ::setenv("HOME", params["HOME"].c_str(), true);
-    Face face;
-    security::v2::KeyChain keyChain;
-    mClient = new ClientModule(face, keyChain);
+    mFace = new Face();
+    mKeyChain = new KeyChain();
+    mClient = new ClientModule((*mFace), (*mKeyChain));
     mClient->getClientConf().load(getConfig());
     __android_log_print(
                 ANDROID_LOG_ERROR,
-                "ndncert-client.cpp: ",
+                NDNCERT_CLIENT_TAG,
                 "Finally I had a working ClientModule.");
-
 }
 
 /*
@@ -180,12 +186,15 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendN
     ClientCaItem clientCaItem = caVec[0];
     Name identityName = clientCaItem.m_caName.getPrefix(-1);
     identityName.append(paramList.front());
+
     mClient->sendNew(
         clientCaItem, identityName,
         std::bind(&newCb, _1, env, obj),
         std::bind(&errorCb, _1, env, obj));
-
-    // TODO: fake server below.
+    __android_log_print(
+        ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
+        "Interest NEW_ sent!");
+    // fake server below.
     /*mState = make_shared<RequestState>();
     mState->m_challengeList = std::list<std::string>({"Email", "PIN", "SMS"});
     mState->m_status = "Select";
@@ -194,6 +203,9 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendN
 void newCb(
   const shared_ptr<RequestState>& requestState,
   JNIEnv* env, jobject obj){
+    __android_log_print(
+        ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
+        "Data NEW_ got!");
     mState = requestState;
     std::list<std::string> textList({"Please select one challenge from following types"});
     std::list<std::string>& hintList = requestState->m_challengeList;
@@ -231,18 +243,24 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendS
     auto paramList = jStrArr2CppStrList(env, arr);
     auto challenge = ChallengeModule::createChallengeModule(choice);
     auto paramJson = challenge->genSelectParamsJson(mState->m_status, paramList);
-    /*client->sendSelect(
+    mClient->sendSelect(
         mState, paramList.front(), paramJson,
         std::bind(&selectCb, _1, env, obj),
-        std::bind(&errorCb, _1, env, obj));*/
-    // TODO: fake server below.
-    mState->m_challengeType = choice;
+        std::bind(&errorCb, _1, env, obj));
+    __android_log_print(
+        ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
+        "Interest SELECT_ sent!");
+    // fake server below.
+    /*mState->m_challengeType = choice;
     mState->m_status = "need-code";
-    selectCb(mState, env, obj);
+    selectCb(mState, env, obj);*/
 }
 void selectCb(
   const shared_ptr<RequestState>& requestState,
   JNIEnv* env, jobject obj){
+    __android_log_print(
+        ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
+        "Data SELECT_ got!");
     mState = requestState;
 
     auto challenge = ChallengeModule::createChallengeModule(mState->m_challengeType);
@@ -266,30 +284,38 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendV
     auto paramList = jStrArr2CppStrList(env, arr);
     auto challenge = ChallengeModule::createChallengeModule(mState->m_challengeType);
     auto paramJson = challenge->genValidateParamsJson(mState->m_status, paramList);
-    /*client->sendValidate(
+    mClient->sendValidate(
         mState, paramJson,
-        std::bind(validateCb&, _1, env, obj),
-        std::bind(&errorCb, _1, env, obj));*/
-    // TODO: fake server below.
-    if (paramList.front() == "961030"){
+        std::bind(&validateCb, _1, env, obj),
+        std::bind(&errorCb, _1, env, obj));
+    __android_log_print(
+        ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
+        "Interest VALIDATE_ sent!");
+    // fake server below.
+    /*if (paramList.front() == "961030"){
         mState->m_status = ChallengeModule::SUCCESS;
     } else {
         mState->m_status = ChallengeModule::FAILURE;
     }
-    validateCb(mState, env, obj);
+    validateCb(mState, env, obj);*/
 }
 void validateCb(
   const shared_ptr<RequestState>& requestState,
   JNIEnv* env, jobject obj){
+    __android_log_print(
+        ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
+        "Data VALIDATE_ got!");
     mState = requestState;
     if (mState->m_status == ChallengeModule::SUCCESS) {
         __android_log_print(
-            ANDROID_LOG_ERROR,
-            "ndncert-client.cpp: ",
+            ANDROID_LOG_ERROR, NDNCERT_CLIENT_TAG,
             "DONE! Certificate has already been issued \n");
-        /*client->requestDownload(mState,
+        mClient->requestDownload(mState,
                              bind(downloadCb, _1, env, obj),
-                             std::bind(&errorCb, _1, env, obj));*/
+                             std::bind(&errorCb, _1, env, obj));
+        __android_log_print(
+            ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
+            "Interest DOWNLOAT_ sent!");
         downloadCb(mState, env, obj);
     } else {
         auto challenge = ChallengeModule::createChallengeModule(mState->m_challengeType);
@@ -309,12 +335,27 @@ void downloadCb(
     mState = requestState;
 
     __android_log_print(
-        ANDROID_LOG_ERROR,
-        "ndncert-client.cpp: ",
-        "DONE! Certificate has already been installed to local keychain\n");
+        ANDROID_LOG_ERROR, NDNCERT_CLIENT_TAG,
+        "DONE! Certificate has already been installed to local keychain");
 
     // Call text function.
     callJavaTextDialog(
         env, obj, "Congratulations!",
         "You certificate has already been installed to local keychain.");
+}
+
+/*
+ * Class:     com_ndn_jwtan_identitymanager_NdncertClient
+ * Method:    stopNdncertClient
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_stopNdncertClient
+  (JNIEnv * env, jobject obj){
+    delete mFace;
+    delete mKeyChain;
+    delete mClient;
+
+    __android_log_print(
+        ANDROID_LOG_ERROR, NDNCERT_CLIENT_TAG,
+        "Resource cleaned up.");
 }

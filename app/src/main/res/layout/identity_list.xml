@@ -26,7 +26,8 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_centerInParent="true"
-            android:onClick="newIdentity" />
+            android:onClick="newIdentity"
+            android:foregroundGravity="center_vertical" />
 
     </RelativeLayout>
 </LinearLayout>

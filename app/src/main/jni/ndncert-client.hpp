@@ -85,6 +85,14 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_startNdn
 
 /*
  * Class:     com_ndn_jwtan_identitymanager_NdncertClient
+ * Method:    stopNdncertClient
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_stopNdncertClient
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_ndn_jwtan_identitymanager_NdncertClient
  * Method:    cppSendNew
  * Signature: ([Ljava/lang/String;)V
  */

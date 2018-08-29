@@ -26,6 +26,7 @@ public class NdncertClient extends AppCompatActivity {
 
     static public native String init();
     public native void startNdncertClient(Map<String, String> params);
+    public native void stopNdncertClient();
     public native void cppSendNew(String[] s);
     public native void cppSelectChallenge(String[] s);
     public native void cppSendSelect(String[] s);
@@ -203,4 +204,11 @@ public class NdncertClient extends AppCompatActivity {
         mBuilder.setView(layout);
         dialog = mBuilder.create();
         dialog.show();
-    }}
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        stopNdncertClient();
+    }
+}

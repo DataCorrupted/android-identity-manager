@@ -14,6 +14,8 @@
 #include <boost/filesystem.hpp>
 #include <ndn-cxx/security/verification-helpers.hpp>
 
+#include "androidbuf.cpp"
+
 #ifndef NDNCERT_CLIENT_TAG
 #define NDNCERT_CLIENT_TAG "nencert-client.cpp: "
 #endif
@@ -40,8 +42,7 @@ void callJavaTextDialog(
 
 void errorCb(const std::string& errorInfo, JNIEnv* env, jobject obj){
     __android_log_print(
-        ANDROID_LOG_ERROR,
-        NDNCERT_CLIENT_TAG,
+        ANDROID_LOG_ERROR, NDNCERT_CLIENT_TAG,
         "%s", errorInfo.c_str());
     callJavaTextDialog(env, obj, "Error!", errorInfo);
 }
@@ -55,7 +56,7 @@ void downloadCb(const shared_ptr<RequestState>& requestState, JNIEnv* env, jobje
 // to cpp std::map<std::string, std::string>
 std::map<std::string, std::string>
 getParams(JNIEnv* env, jobject jParams){
-  std::map<std::string, std::string> params;
+    std::map<std::string, std::string> params;
 
     jclass jcMap = env->GetObjectClass(jParams);
     jclass jcSet = env->FindClass("java/util/Set");
@@ -161,14 +162,16 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_startNdn
   (JNIEnv * env, jobject obj, jobject jParams){
     std::map<std::string, std::string> params = getParams(env, jParams);
     ::setenv("HOME", params["HOME"].c_str(), true);
+
+    start_logger("ndncert-client");
     mFace = new Face();
     mKeyChain = new KeyChain();
     mClient = new ClientModule((*mFace), (*mKeyChain));
     mClient->getClientConf().load(getConfig());
+    std::cerr << "Trying to display c log\n" ;
     __android_log_print(
-                ANDROID_LOG_ERROR,
-                NDNCERT_CLIENT_TAG,
-                "Finally I had a working ClientModule.");
+        ANDROID_LOG_ERROR, NDNCERT_CLIENT_TAG,
+        "Finally I had a working ClientModule.");
 }
 
 /*
@@ -193,7 +196,7 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendN
         std::bind(&errorCb, _1, env, obj));
     __android_log_print(
         ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
-        "Interest NEW_ sent!");
+        "Interest _NEW sent!");
     // fake server below.
     /*mState = make_shared<RequestState>();
     mState->m_challengeList = std::list<std::string>({"Email", "PIN", "SMS"});
@@ -205,7 +208,7 @@ void newCb(
   JNIEnv* env, jobject obj){
     __android_log_print(
         ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
-        "Data NEW_ got!");
+        "Data _NEW got!");
     mState = requestState;
     std::list<std::string> textList({"Please select one challenge from following types"});
     std::list<std::string>& hintList = requestState->m_challengeList;
@@ -225,7 +228,6 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSelec
     auto paramList = jStrArr2CppStrList(env, arr);
     choice = paramList.front();
     auto challenge = ChallengeModule::createChallengeModule(choice);
-    // TODO: ask for more info, for example: email address.
     auto requirementList = challenge->getRequirementForSelect();
 
     std::list<std::string> textList = requirementList;
@@ -249,7 +251,7 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendS
         std::bind(&errorCb, _1, env, obj));
     __android_log_print(
         ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
-        "Interest SELECT_ sent!");
+        "Interest _SELECT sent!");
     // fake server below.
     /*mState->m_challengeType = choice;
     mState->m_status = "need-code";
@@ -260,7 +262,7 @@ void selectCb(
   JNIEnv* env, jobject obj){
     __android_log_print(
         ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
-        "Data SELECT_ got!");
+        "Data _SELECT got!");
     mState = requestState;
 
     auto challenge = ChallengeModule::createChallengeModule(mState->m_challengeType);
@@ -290,7 +292,7 @@ JNIEXPORT void JNICALL Java_com_ndn_jwtan_identitymanager_NdncertClient_cppSendV
         std::bind(&errorCb, _1, env, obj));
     __android_log_print(
         ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
-        "Interest VALIDATE_ sent!");
+        "Interest _VALIDATE sent!");
     // fake server below.
     /*if (paramList.front() == "961030"){
         mState->m_status = ChallengeModule::SUCCESS;
@@ -304,7 +306,7 @@ void validateCb(
   JNIEnv* env, jobject obj){
     __android_log_print(
         ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
-        "Data VALIDATE_ got!");
+        "Data _VALIDATE got!");
     mState = requestState;
     if (mState->m_status == ChallengeModule::SUCCESS) {
         __android_log_print(
@@ -315,7 +317,7 @@ void validateCb(
                              std::bind(&errorCb, _1, env, obj));
         __android_log_print(
             ANDROID_LOG_INFO, NDNCERT_CLIENT_TAG,
-            "Interest DOWNLOAT_ sent!");
+            "Interest _DOWNLOAT sent!");
         downloadCb(mState, env, obj);
     } else {
         auto challenge = ChallengeModule::createChallengeModule(mState->m_challengeType);

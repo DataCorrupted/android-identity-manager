@@ -110,9 +110,8 @@ public class MainActivity extends AppCompatActivity {
 
     public String[] getIdentities(){
         // TODO: Get id list from HOME/.ndn/
-        //String[] identities = {"PeterRong", "JiaweiLing"};
-        //identities = new String[0];
-        //return identities;
-        return new String[0];
+        String[] identities = {"PeterRong"};
+        return identities;
+        //return new String[0];
     }
 }

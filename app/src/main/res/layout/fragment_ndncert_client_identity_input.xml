@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.ndn.jwtan.identitymanager.NdncertClientIdentityInput"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/identity_caption"
+        android:textAppearance="@android:style/TextAppearance.DialogWindowTitle" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:id="@+id/editIdentity" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom">
+
+        <Button
+            android:id="@+id/buttonDecline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/button_back"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_weight="1"
+            android:onClick="declineClick" />
+
+        <Button
+            android:id="@+id/buttonContinue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/button_continue"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:layout_weight="1"
+            android:onClick="sendNewClick" />
+    </LinearLayout>
+
+</LinearLayout>

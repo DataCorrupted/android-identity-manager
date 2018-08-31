@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -28,10 +29,24 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import android.support.design.widget.TabLayout;
 
+import net.named_data.jndn.Face;
+import net.named_data.jndn.Name;
+import net.named_data.jndn.security.KeyChain;
+import net.named_data.jndn.security.pib.AndroidSqlite3Pib;
+import net.named_data.jndn.security.pib.PibImpl;
+import net.named_data.jndn.security.policy.NoVerifyPolicyManager;
+import net.named_data.jndn.security.tpm.TpmBackEndFile;
+import net.named_data.jndncert.client.ClientCaItem;
+import net.named_data.jndncert.client.ClientModule;
+
 public class GenerateToken extends AppCompatActivity {
+
+    private final String TAG = "GenerateTokes";
+    private ClientModule client;
 
     private final static String mURL = MainActivity.HOST + "/tokens/request/";
     private String caption = "";
@@ -47,6 +62,7 @@ public class GenerateToken extends AppCompatActivity {
     private TabLayout.Tab tab1;
     private TabLayout.Tab tab2;
     private TabLayout.Tab tab3;
+    private TabLayout.Tab tab4;
 
     ////////////////////////////////////////////////////////////
     @Override
@@ -54,15 +70,30 @@ public class GenerateToken extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate_token_and_identity);
 
+        String HOME = this.getFilesDir().getAbsolutePath();
+        try{
+            client = new ClientModule(
+                    new Face(),
+                    new KeyChain(
+                            new AndroidSqlite3Pib(HOME + "/.ndn"),
+                            new TpmBackEndFile(HOME + "/.ndn"),
+                            new NoVerifyPolicyManager()));
+        } catch (PibImpl.Error e){
+            Log.e(TAG, e.getMessage());
+        }
+        client.getClientConf().load(ClientConf.getJsonConf());
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tab0 = tabLayout.newTab().setIcon(R.drawable.icon_filled);
         tab1 = tabLayout.newTab().setIcon(R.drawable.icon_empty);
         tab2 = tabLayout.newTab().setIcon(R.drawable.icon_empty);
         tab3 = tabLayout.newTab().setIcon(R.drawable.icon_empty);
+        tab4 = tabLayout.newTab().setIcon(R.drawable.icon_empty);
         tabLayout.addTab(tab0);
         tabLayout.addTab(tab1);
         tabLayout.addTab(tab2);
         tabLayout.addTab(tab3);
+        tabLayout.addTab(tab4);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         viewPager = (UICustomViewPager) findViewById(R.id.pager);
@@ -82,61 +113,8 @@ public class GenerateToken extends AppCompatActivity {
 
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        /*
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-        */
-
-        // Disabled picking from gallery for now
-        /*
-        Intent intent;
-
-        if (Build.VERSION.SDK_INT < 19){
-            intent = new Intent();
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            startActivityForResult(intent, KITKAT_VALUE);
-        } else {
-            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("image/*");
-            startActivityForResult(intent, KITKAT_VALUE);
-        }
-        */
 
     }
-
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-            Cursor cursor = getContentResolver().query(selectedImage,filePathColumn, null, null, null);
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-            ImageView imageView = (ImageView) findViewById(R.id.imageView1);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-        }
-    }
-    */
 
     public void submitEmail(View view) {
         Button button = (Button) findViewById(R.id.submitEmail);
@@ -194,6 +172,12 @@ public class GenerateToken extends AppCompatActivity {
     }
 
     public void tab2Click(View view) {
+        if (android.os.Build.VERSION.SDK_INT > 9)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
         EditText editText = (EditText) findViewById(R.id.emailText);
         String email = editText.getText().toString();
 
@@ -203,8 +187,18 @@ public class GenerateToken extends AppCompatActivity {
         if (isValidEmailAddress(email)) {
             if (! idName.equals("")) {
                 this.caption = idName;
-                viewPager.setCurrentItem(2);
-                tab2.setIcon(R.drawable.icon_filled);
+                ClientCaItem caItem = client.getClientConf().m_caItems.get(0);
+                Name identityName = caItem.m_caName.getPrefix(-1);
+                identityName.append(idName);
+                client.sendNew(
+                        caItem, identityName,
+                        (state -> {
+                            viewPager.setCurrentItem(2);
+                            tab2.setIcon(R.drawable.icon_filled);
+                            Log.e(TAG, "Data received.");
+                        }),
+                        (errInfo -> Log.e(TAG, "Got NACK")));
+                Log.e(TAG, "Data sent.");
             } else {
                 String toastString = "Please give an identity name";
                 Toast.makeText(getApplicationContext(), toastString, Toast.LENGTH_LONG).show();

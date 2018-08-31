@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.2'
 
     defaultConfig {
         applicationId "com.ndn.jwtan.identitymanager"
-        minSdkVersion 15
-        targetSdkVersion 23
+        minSdkVersion 23
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         multiDexEnabled true //important
@@ -18,10 +18,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main.java.srcDirs += 'libs/jndncert/src'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(include: ['*.jar'], dir: 'libs')
     api('net.named-data:jndn-android:0.17') {
         exclude group: 'com.google.android', module: 'android'
         exclude group: 'org.xerial'

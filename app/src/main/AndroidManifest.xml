@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!-- Read from gallery, not implemented for now -->
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -29,6 +31,11 @@
         <activity
             android:name=".GenerateToken"
             android:label="@string/title_activity_generate_token"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
+        </activity>
+        <activity
+            android:name=".NdncertClient"
+            android:label="@string/title_activity_ndncert_client"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
         </activity>
         <activity

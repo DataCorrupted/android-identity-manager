@@ -21,9 +21,7 @@ public class MainActivity extends AppCompatActivity {
     // On memoria, my ICN chat cert runs on 5000, while the openmhealth cert runs on 5001
     protected static final String HOST = "http://memoria.ndn.ucla.edu:5001";
     private static final String slotTaken = "used";
-
     private String usage = "main";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Intent intent = getIntent();
@@ -38,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //getIdentities();
     }
 
     @Override
@@ -85,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 traceApplications((String)fab.getTag(R.string.tags_id_name));
             }
         } else {
-            Intent intent = new Intent(this, GenerateToken.class);
+            Intent intent = new Intent(this, NdncertClient.class);
             startActivity(intent);
         }
     }

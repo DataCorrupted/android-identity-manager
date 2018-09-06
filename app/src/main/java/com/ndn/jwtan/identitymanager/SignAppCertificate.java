@@ -30,9 +30,7 @@ import net.named_data.jndn.util.CommandInterestGenerator;
 
 import static android.content.ContentValues.TAG;
 
-/**
- * Created by zhehaowang on 1/9/16.
- */
+// TODO: Change this.
 public class SignAppCertificate extends Activity {
 
     ////////////////////////////////////////////////////////////

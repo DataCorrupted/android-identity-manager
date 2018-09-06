@@ -87,6 +87,9 @@ public class NdncertClientValidate extends Fragment {
             }
             validateParamList.add(tempStr);
         }
+        Toast.makeText(getContext(),
+                R.string.valid_input,
+                Toast.LENGTH_SHORT).show();
         mCallback.sendValidate(validateParamList);
     };
 

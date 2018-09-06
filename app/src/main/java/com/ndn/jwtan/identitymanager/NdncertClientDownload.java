@@ -53,5 +53,6 @@ public class NdncertClientDownload extends Fragment {
         return view;
     }
 
-    private View.OnClickListener sendDownload = view -> mCallback.sendDownload();
+    private View.OnClickListener sendDownload
+            = view -> mCallback.sendDownload();
 }

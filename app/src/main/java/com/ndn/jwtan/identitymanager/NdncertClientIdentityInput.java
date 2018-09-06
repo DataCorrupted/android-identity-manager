@@ -75,7 +75,4 @@ public class NdncertClientIdentityInput extends Fragment {
     Boolean existsID(String name){
         return false;
     }
-
-
-
 }

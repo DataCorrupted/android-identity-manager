@@ -13,13 +13,12 @@ import android.view.View;
 import android.util.Log;
 import android.widget.TextView;
 
+// TODO: Remove all V1 part.
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
 
     protected static final String DB_NAME = "certDb.db";
     protected static final String CERT_DIR = "certDir";
-    // TODO: Stuck at submit email address without timeout if HOST misconfigured.
-    // On memoria, my ICN chat cert runs on 5000, while the openmhealth cert runs on 5001
-    protected static final String HOST = "http://memoria.ndn.ucla.edu:5001";
     private static final String slotTaken = "used";
     private String usage = "main";
     @Override
@@ -29,19 +28,18 @@ public class MainActivity extends AppCompatActivity {
         String appID = intent.getStringExtra("app_id");
         if (appID != null) {
             usage = "authorize";
+        } else {
+            usage = "Identity manager stated by user.";
         }
-
-        Log.e("zhehao", usage);
-
+        Log.i(TAG, usage);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
     }
 
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
-        Log.e("zhehao", "on resume");
+        Log.e(TAG, "on resume");
         getIdentities();
     }
 
@@ -82,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
                 traceApplications((String)fab.getTag(R.string.tags_id_name));
             }
         } else {
-            Intent intent = new Intent(this, NdncertClient.class);
-            startActivity(intent);
+            startActivity(
+                    new Intent(this, NdncertClient.class));
         }
     }
 

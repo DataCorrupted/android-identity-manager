@@ -66,13 +66,13 @@ public class NdncertClientSelectChallenge extends ListFragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_ndncert_client_select_challenge, container, false);
-        ListView lv = view.findViewById(android.R.id.list);
+        ListView listView = view.findViewById(android.R.id.list);
         ArrayAdapter<String> challengeListAdapter =
                 new ArrayAdapter<>(getActivity(),
                         R.layout.fragment_ndncert_client_select_challenge_list_item,
                         R.id.select_challenge_text,
                         mChallengeList);
-        lv.setAdapter(challengeListAdapter);
+        listView.setAdapter(challengeListAdapter);
 
         // Inflate the layout for this fragment
         return view;
@@ -122,31 +122,33 @@ public class NdncertClientSelectChallenge extends ListFragment {
 
         // Setup click listener.
         dialog.setOnShowListener(dialogInterface -> {
-                Button btnEnter = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                btnEnter.setOnClickListener(view -> {
-                        // Extract all the inputs given by the user and call cb function
-                        // Don't worry about editTexts length, they will be set
-                        // by the time user clicks.
-                        ArrayList<String> inputs = new ArrayList<>();
-                        for (EditText editText: editTexts){
-                            String tmp = editText.getText().toString();
-                            if (tmp.isEmpty()){
-                                Toast.makeText(getContext(),
-                                        R.string.empty_input,
-                                        Toast.LENGTH_SHORT).show();
-                                return;
-                            } else {
-                                inputs.add(tmp);
-                            }
+                View.OnClickListener onEnterListener = view -> {
+                    // Extract all the inputs given by the user and call cb function
+                    // Don't worry about editTexts length, they will be set
+                    // by the time user clicks.
+                    ArrayList<String> inputs = new ArrayList<>();
+                    for (EditText editText: editTexts){
+                        String tmp = editText.getText().toString();
+                        if (tmp.isEmpty()){
+                            Toast.makeText(getContext(),
+                                    R.string.empty_input,
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        } else {
+                            inputs.add(tmp);
                         }
-                        Toast.makeText(getContext(),
-                                R.string.valid_input,
-                                Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                        mCallback.sendSelect(choice, challenge, inputs);
-                });
+                    }
+                    Toast.makeText(getContext(),
+                            R.string.valid_input,
+                            Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    mCallback.sendSelect(choice, challenge, inputs);
+                };
+                Button btnEnter = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                btnEnter.setOnClickListener(onEnterListener);
+
                 Button btnCancel = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                btnCancel.setOnClickListener((view) ->
+                btnCancel.setOnClickListener(view ->
                         startActivity(new Intent(getContext(), MainActivity.class))
                 );
         });

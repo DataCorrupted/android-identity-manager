@@ -6,7 +6,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import net.named_data.jndn.Face;
@@ -16,7 +15,6 @@ import net.named_data.jndn.security.pib.AndroidSqlite3Pib;
 import net.named_data.jndn.security.pib.PibImpl;
 import net.named_data.jndn.security.policy.NoVerifyPolicyManager;
 import net.named_data.jndn.security.tpm.TpmBackEndFile;
-import net.named_data.jndncert.challenge.ChallengeFactory;
 import net.named_data.jndncert.challenge.ChallengeModule;
 import net.named_data.jndncert.client.ClientCaItem;
 import net.named_data.jndncert.client.ClientModule;
@@ -94,8 +92,7 @@ public class NdncertClient extends AppCompatActivity
 
     void acceptClick(View view){
         Log.i(TAG, "User agreed to our condition. Collecting identity name.");
-        viewPager.setCurrentItem(1);
-        tabs[1].setIcon(R.drawable.icon_filled);
+        switchToFragmentNum(1);
     }
 
     void declineClick(View view){
@@ -110,8 +107,7 @@ public class NdncertClient extends AppCompatActivity
             Log.i(TAG, "_NEW data received.");
             mState = state;
             Log.i(TAG, "State info recorded.");
-            viewPager.setCurrentItem(2);
-            tabs[2].setIcon(R.drawable.icon_filled);
+            switchToFragmentNum(2);
             NdncertClientSelectChallenge selectFragment =
                     (NdncertClientSelectChallenge)
                             adapter.getCurrentFragment();
@@ -142,8 +138,7 @@ public class NdncertClient extends AppCompatActivity
             Log.i(TAG, "_SELECT data received.");
             mState = state;
             Log.i(TAG, "State info recorded.");
-            viewPager.setCurrentItem(3);
-            tabs[3].setIcon(R.drawable.icon_filled);
+            switchToFragmentNum(3);
             NdncertClientValidate validateFragment =
                     (NdncertClientValidate)
                             adapter.getCurrentFragment();
@@ -171,13 +166,11 @@ public class NdncertClient extends AppCompatActivity
             Log.i(TAG, "State info recorded.");
             if (mState.m_status.equals(ChallengeModule.SUCCESS)){
                 Log.i(TAG, "Validate successful.");
-                viewPager.setCurrentItem(4);
-                tabs[4].setIcon(R.drawable.icon_filled);
+                switchToFragmentNum(4);
                 return;
             }
             Log.i(TAG, "Validate failed, retrying.");
-            viewPager.setCurrentItem(3);
-            tabs[3].setIcon(R.drawable.icon_filled);
+            switchToFragmentNum(3);
             NdncertClientValidate validateFragment =
                     (NdncertClientValidate)
                             adapter.getCurrentFragment();
@@ -199,8 +192,7 @@ public class NdncertClient extends AppCompatActivity
     public void sendDownload(){
         ClientModule.RequestCallback downloadCb = state ->{
             Log.i(TAG, "_DOWNLOAD data received.");
-            viewPager.setCurrentItem(5);
-            tabs[5].setIcon(R.drawable.icon_filled);
+            switchToFragmentNum(5);
         };
         //client.requestDownload(mState, downloadCb, errorCb);
         Log.i(TAG, "_DOWNLOAD interest expressed.");
@@ -208,5 +200,11 @@ public class NdncertClient extends AppCompatActivity
         // TODO: Fake server below.
         downloadCb.onRequest(mState);
         // Fake server above
+    }
+
+    private void switchToFragmentNum(int k){
+        viewPager.setCurrentItem(k);
+        tabs[k].setIcon(R.drawable.icon_filled);
+        Log.i(TAG, "Switched to fragment #" + k);
     }
 }

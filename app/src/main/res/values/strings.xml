@@ -66,6 +66,7 @@
         <item>SMS</item>
     </string-array>
 
+    <string name="invalid_identity">Please give me a valid, non-empty identity name!</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

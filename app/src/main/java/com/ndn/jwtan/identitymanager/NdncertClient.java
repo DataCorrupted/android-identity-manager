@@ -27,7 +27,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class NdncertClient extends AppCompatActivity
-        implements NdncertClientSelectChallenge.SendSelect{
+        implements
+            NdncertClientIdentityInput.SendNew,
+            NdncertClientSelectChallenge.SendSelect{
     private final String TAG = "NdncertClient";
 
     private ClientModule client;
@@ -98,7 +100,8 @@ public class NdncertClient extends AppCompatActivity
         startActivity(intent);
     }
 
-    void sendNewClick(View view){
+    @Override
+    public void sendNew(String identityStr){
         // Define Cb function
         ClientModule.RequestCallback newCb = state -> {
             Log.i(TAG, "_NEW data received.");
@@ -113,12 +116,6 @@ public class NdncertClient extends AppCompatActivity
             Log.i(TAG, "New fragment switched.");
         };
 
-        EditText editIdentity =
-                (EditText) findViewById(R.id.editIdentity);
-        String identityStr = editIdentity.getText().toString();
-        if (existsID(identityStr)){
-            return;
-        }
         ClientCaItem caItem = client.getClientConf().m_caItems.get(0);
         Name identityName = caItem.m_caName.getPrefix(-1);
         identityName.append(identityStr);
@@ -144,6 +141,7 @@ public class NdncertClient extends AppCompatActivity
             String choice,
             ChallengeModule challenge,
             ArrayList<String> paramList) {
+        // Define Cb function
         ClientModule.RequestCallback selectCb = state -> {
             Log.i(TAG, "_SELECT data received.");
             mState = state;
@@ -156,12 +154,4 @@ public class NdncertClient extends AppCompatActivity
         client.sendSelect(mState, choice, paramJson, selectCb, errorCb);
         Log.i(TAG, "_SELECT interest expressed.");
     }
-
-
-    // TODO: Check if the id name exists before.
-    Boolean existsID(String name){
-        return false;
-    }
-
-
 }

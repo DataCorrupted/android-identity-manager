@@ -24,15 +24,15 @@ import net.named_data.jndncert.challenge.ChallengeModule;
 import java.util.ArrayList;
 
 public class NdncertClientSelectChallenge extends ListFragment {
+    private final String TAG = "NdncertClientSelect";
     public interface SendSelect{
         void sendSelect(
                 String choice,
                 ChallengeModule challenge,
                 ArrayList<String> requirementList);
     }
-    private final String TAG = "NdncertClientSelect";
-    private ArrayList<String> mChallengeList = new ArrayList<>();
     private SendSelect mCallback;
+    private ArrayList<String> mChallengeList = new ArrayList<>();
 
     public NdncertClientSelectChallenge() {
         // Required empty public constructor
@@ -52,7 +52,7 @@ public class NdncertClientSelectChallenge extends ListFragment {
         try{
             mCallback = (SendSelect) context;
         } catch (ClassCastException e){
-            Log.e(TAG, context.toString() + "must implement OnHeadlineSelectedListener");
+            Log.e(TAG, context.toString() + "must implement interface SendNew");
         }
     }
 

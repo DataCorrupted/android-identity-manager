@@ -59,6 +59,13 @@
     <string name="valid_input">We got your input!</string>
     <string name="empty_input">Please fill in the empty!</string>
 
+    <string name="example_item">ExampleChallenge</string>
+    <string-array name="sample_challenge_array">
+        <item>Email</item>
+        <item>PIN</item>
+        <item>SMS</item>
+    </string-array>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -3,7 +3,6 @@ package com.ndn.jwtan.identitymanager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,13 +16,18 @@ import net.named_data.jndn.security.pib.AndroidSqlite3Pib;
 import net.named_data.jndn.security.pib.PibImpl;
 import net.named_data.jndn.security.policy.NoVerifyPolicyManager;
 import net.named_data.jndn.security.tpm.TpmBackEndFile;
+import net.named_data.jndncert.challenge.ChallengeFactory;
+import net.named_data.jndncert.challenge.ChallengeModule;
 import net.named_data.jndncert.client.ClientCaItem;
 import net.named_data.jndncert.client.ClientModule;
+import net.named_data.jndncert.client.RequestState;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 public class NdncertClient extends AppCompatActivity
-        implements NdncertClientSelectChallenge.SendSelect {
+        implements NdncertClientSelectChallenge.SendSelect{
     private final String TAG = "NdncertClient";
 
     private ClientModule client;
@@ -33,6 +37,8 @@ public class NdncertClient extends AppCompatActivity
     private TabLayout.Tab[] tabs = new TabLayout.Tab[tabsCnt];
     private NdncertClientPageAdapter adapter;
 
+    private RequestState mState = new RequestState();
+    private ClientModule.ErrorCallback errorCb = (errInfo -> Log.e(TAG, errInfo));
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -93,6 +99,20 @@ public class NdncertClient extends AppCompatActivity
     }
 
     void sendNewClick(View view){
+        // Define Cb function
+        ClientModule.RequestCallback newCb = state -> {
+            Log.i(TAG, "_NEW data received.");
+            mState = state;
+            Log.i(TAG, "State info recorded.");
+            viewPager.setCurrentItem(2);
+            tabs[2].setIcon(R.drawable.icon_filled);
+            NdncertClientSelectChallenge selectFragment =
+                    (NdncertClientSelectChallenge)
+                            adapter.getCurrentFragment();
+            selectFragment.setChallengeList(mState.m_challengeList);
+            Log.i(TAG, "New fragment switched.");
+        };
+
         EditText editIdentity =
                 (EditText) findViewById(R.id.editIdentity);
         String identityStr = editIdentity.getText().toString();
@@ -102,25 +122,39 @@ public class NdncertClient extends AppCompatActivity
         ClientCaItem caItem = client.getClientConf().m_caItems.get(0);
         Name identityName = caItem.m_caName.getPrefix(-1);
         identityName.append(identityStr);
-        client.sendNew(
-                caItem, identityName,
-                (state -> {
-                    Log.i(TAG, "Data received.");
-                    NdncertClientSelectChallenge selectFragment =
-                            (NdncertClientSelectChallenge)
-                                    getSupportFragmentManager()
-                                    .findFragmentById(R.id.select_challenge);
-                    selectFragment.setChallengeList(state.m_challengeList);
-                    viewPager.setCurrentItem(2);
-                    tabs[2].setIcon(R.drawable.icon_filled);
-                }),
-                (errInfo -> Log.e(TAG, errInfo)));
+        // Send New Interest
+        // client.sendNew(caItem, identityName, newCb, errorCb);
+        // TODO: Fake server below.
+        mState.m_challengeList = new ArrayList<>();
+        mState.m_challengeList.add("Email");
+        mState.m_challengeList.add("Pin");
+
+        viewPager.setCurrentItem(2);
+        tabs[2].setIcon(R.drawable.icon_filled);
+
+        NdncertClientSelectChallenge selectFragment =
+                (NdncertClientSelectChallenge) adapter.getCurrentFragment();
+        selectFragment.setChallengeList(mState.m_challengeList);
+        // Fake server above.
+
         Log.i(TAG, "_NEW interest expressed.");
     }
-
     @Override
-    public void sendSelect(String choice, ArrayList<String> requirementList) {
-
+    public void sendSelect(
+            String choice,
+            ChallengeModule challenge,
+            ArrayList<String> paramList) {
+        ClientModule.RequestCallback selectCb = state -> {
+            Log.i(TAG, "_SELECT data received.");
+            mState = state;
+            Log.i(TAG, "State info recorded.");
+            viewPager.setCurrentItem(3);
+            tabs[3].setIcon(R.drawable.icon_filled);
+        };
+        JSONObject paramJson = challenge.genSelectParamsJson(
+                mState.m_status, paramList);
+        client.sendSelect(mState, choice, paramJson, selectCb, errorCb);
+        Log.i(TAG, "_SELECT interest expressed.");
     }
 
 

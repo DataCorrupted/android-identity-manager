@@ -1,0 +1,19 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="30pt"
+    tools:context="com.ndn.jwtan.identitymanager.NdncertClientSelectChallenge"
+    android:orientation="vertical"
+    android:weightSum="1"
+    android:id="@+id/select_challenge">
+
+    <TextView
+        android:id="@+id/select_challenge_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:text="@string/example_item"
+        android:textAppearance="@android:style/TextAppearance.DialogWindowTitle" />
+
+</LinearLayout>

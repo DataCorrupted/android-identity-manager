@@ -42,7 +42,11 @@ public class NdncertClientPageAdapter extends FragmentStatePagerAdapter {
             case 2:
                 return NdncertClientSelectChallenge.newInstance();
             case 3:
-                return UICreateOpenmHealthIDRequestSent.newInstance("Some hint", false);
+                return NdncertClientValidate.newInstance();
+            case 4:
+                return NdncertClientDownload.newInstance();
+            case 5:
+                return NdncertClientIdPictureSelect.newInstance();
             default:
                 return null;
         }

@@ -1,0 +1,26 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="60pt"
+    tools:context="com.ndn.jwtan.identitymanager.NdncertClientValidate"
+    android:orientation="vertical"
+    android:weightSum="1"
+    android:id="@+id/validate">
+
+    <TextView
+        android:id="@+id/validate_text"
+        android:layout_width="match_parent"
+        android:layout_height="20pt"
+        android:gravity="center_vertical"
+        android:text="@string/example_item"
+        android:textAppearance="@android:style/TextAppearance.DialogWindowTitle" />
+
+    <EditText
+        android:id="@+id/validate_edit"
+        android:layout_width="match_parent"
+        android:layout_height="20pt"
+        android:gravity="center_vertical"
+        android:textAppearance="@android:style/TextAppearance.DialogWindowTitle" />
+
+</LinearLayout>

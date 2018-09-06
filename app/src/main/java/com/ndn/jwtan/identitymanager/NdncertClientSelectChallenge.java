@@ -61,17 +61,11 @@ public class NdncertClientSelectChallenge extends ListFragment {
         super.onCreate(savedInstanceState);
     }
 
-    // Put up a dummy view first. Save the inflater and container.
-    // We will change it after we got real challenge list.
-    private LayoutInflater mInflater;
-    private ViewGroup mContainer;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mInflater = inflater;
-        mContainer = container;
 
-        View view = mInflater.inflate(R.layout.fragment_ndncert_client_select_challenge, mContainer, false);
+        View view = inflater.inflate(R.layout.fragment_ndncert_client_select_challenge, container, false);
         ListView lv = view.findViewById(android.R.id.list);
         ArrayAdapter<String> challengeListAdapter =
                 new ArrayAdapter<>(getActivity(),
@@ -93,7 +87,7 @@ public class NdncertClientSelectChallenge extends ListFragment {
         ChallengeModule challenge =
                 ChallengeFactory.createChallengeModule(choice);
         ArrayList<String> requirementList =
-                challenge.getRequirementForSelection();
+                challenge.getSelectRequirements();
 
         // No need to create this dialog if there is nothing to input.
         if (requirementList.size() == 0) {
@@ -127,9 +121,9 @@ public class NdncertClientSelectChallenge extends ListFragment {
         dialog = mBuilder.create();
 
         // Setup click listener.
-        dialog.setOnShowListener((dialogInterface) -> {
+        dialog.setOnShowListener(dialogInterface -> {
                 Button btnEnter = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                btnEnter.setOnClickListener((view) -> {
+                btnEnter.setOnClickListener(view -> {
                         // Extract all the inputs given by the user and call cb function
                         // Don't worry about editTexts length, they will be set
                         // by the time user clicks.
@@ -152,9 +146,9 @@ public class NdncertClientSelectChallenge extends ListFragment {
                         mCallback.sendSelect(choice, challenge, inputs);
                 });
                 Button btnCancel = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-                btnCancel.setOnClickListener((view) -> {
-                        startActivity(new Intent(getContext(), MainActivity.class));
-                });
+                btnCancel.setOnClickListener((view) ->
+                        startActivity(new Intent(getContext(), MainActivity.class))
+                );
         });
 
         // Woola, you have your dialog.
@@ -163,16 +157,10 @@ public class NdncertClientSelectChallenge extends ListFragment {
 
     public void setChallengeList(ArrayList<String> challengeList){
         mChallengeList = challengeList;
-        Log.e(TAG, challengeList.size() + "");
+        Log.i(TAG, challengeList.size() + "piece of info required for this challenge.");
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
-                .detach(this)
-                .attach(this)
+                .detach(this).attach(this)
                 .commit();
-/*        View view = mInflater.inflate(R.layout.fragment_ndncert_client_select_challenge, mContainer, false);
-        ListView lv = view.findViewById(android.R.id.list);
-        ArrayAdapter<String> challengeListAdapter =
-                new ArrayAdapter<>(getActivity(), R.layout.fragment_ndncert_client_select_challenge , mChallengeList);
-        lv.setAdapter(challengeListAdapter);*/
     }
 }

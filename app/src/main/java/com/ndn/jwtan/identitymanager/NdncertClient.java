@@ -29,7 +29,9 @@ import java.util.ArrayList;
 public class NdncertClient extends AppCompatActivity
         implements
             NdncertClientIdentityInput.SendNew,
-            NdncertClientSelectChallenge.SendSelect{
+            NdncertClientSelectChallenge.SendSelect,
+            NdncertClientValidate.SendValidate,
+            NdncertClientDownload.SendDownload{
     private final String TAG = "NdncertClient";
 
     private ClientModule client;
@@ -40,6 +42,7 @@ public class NdncertClient extends AppCompatActivity
     private NdncertClientPageAdapter adapter;
 
     private RequestState mState = new RequestState();
+    private ChallengeModule mChallenge;
     private ClientModule.ErrorCallback errorCb = (errInfo -> Log.e(TAG, errInfo));
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -119,22 +122,15 @@ public class NdncertClient extends AppCompatActivity
         ClientCaItem caItem = client.getClientConf().m_caItems.get(0);
         Name identityName = caItem.m_caName.getPrefix(-1);
         identityName.append(identityStr);
-        // Send New Interest
         // client.sendNew(caItem, identityName, newCb, errorCb);
+        Log.i(TAG, "_NEW interest expressed.");
+
         // TODO: Fake server below.
         mState.m_challengeList = new ArrayList<>();
         mState.m_challengeList.add("Email");
         mState.m_challengeList.add("Pin");
-
-        viewPager.setCurrentItem(2);
-        tabs[2].setIcon(R.drawable.icon_filled);
-
-        NdncertClientSelectChallenge selectFragment =
-                (NdncertClientSelectChallenge) adapter.getCurrentFragment();
-        selectFragment.setChallengeList(mState.m_challengeList);
+        newCb.onRequest(mState);
         // Fake server above.
-
-        Log.i(TAG, "_NEW interest expressed.");
     }
     @Override
     public void sendSelect(
@@ -148,10 +144,69 @@ public class NdncertClient extends AppCompatActivity
             Log.i(TAG, "State info recorded.");
             viewPager.setCurrentItem(3);
             tabs[3].setIcon(R.drawable.icon_filled);
+            NdncertClientValidate validateFragment =
+                    (NdncertClientValidate)
+                            adapter.getCurrentFragment();
+            validateFragment.setRequirementList(
+                    mChallenge,
+                    mChallenge.getValidateRequirements(mState.m_status));
         };
-        JSONObject paramJson = challenge.genSelectParamsJson(
+        mChallenge = challenge;
+        Log.i(TAG, "Challenge type recorded.");
+        JSONObject paramJson = mChallenge.genSelectParamsJson(
                 mState.m_status, paramList);
-        client.sendSelect(mState, choice, paramJson, selectCb, errorCb);
+        //client.sendSelect(mState, choice, paramJson, selectCb, errorCb);
         Log.i(TAG, "_SELECT interest expressed.");
+
+        // TODO: Fake server below.
+        mState.m_status = "need-code";
+        selectCb.onRequest(mState);
+        // Fake server above.
+    }
+    @Override
+    public void sendValidate(ArrayList<String> validateParamList){
+        ClientModule.RequestCallback validateCb = state ->{
+            Log.i(TAG, "_VALIDATE date received");
+            mState = state;
+            Log.i(TAG, "State info recorded.");
+            if (mState.m_status.equals(ChallengeModule.SUCCESS)){
+                Log.i(TAG, "Validate successful.");
+                viewPager.setCurrentItem(4);
+                tabs[4].setIcon(R.drawable.icon_filled);
+                return;
+            }
+            Log.i(TAG, "Validate failed, retrying.");
+            viewPager.setCurrentItem(3);
+            tabs[3].setIcon(R.drawable.icon_filled);
+            NdncertClientValidate validateFragment =
+                    (NdncertClientValidate)
+                            adapter.getCurrentFragment();
+            validateFragment.setRequirementList(
+                    mChallenge,
+                    mChallenge.getValidateRequirements(mState.m_status));
+        };
+        JSONObject paramJson = mChallenge.genSelectParamsJson(mState.m_status, validateParamList);
+        // client.sendValidate(mState, paramJson, validateCb, errorCb);
+        Log.i(TAG, "_VALIDATE interest expressed.");
+
+        // TODO: Fake server below.
+        mState.m_status = ChallengeModule.SUCCESS;
+        validateCb.onRequest(mState);
+        // Fake server above.
+    }
+
+    @Override
+    public void sendDownload(){
+        ClientModule.RequestCallback downloadCb = state ->{
+            Log.i(TAG, "_DOWNLOAD data received.");
+            viewPager.setCurrentItem(5);
+            tabs[5].setIcon(R.drawable.icon_filled);
+        };
+        //client.requestDownload(mState, downloadCb, errorCb);
+        Log.i(TAG, "_DOWNLOAD interest expressed.");
+
+        // TODO: Fake server below.
+        downloadCb.onRequest(mState);
+        // Fake server above
     }
 }

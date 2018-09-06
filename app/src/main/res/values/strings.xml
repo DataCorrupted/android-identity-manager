@@ -59,7 +59,7 @@
     <string name="valid_input">We got your input!</string>
     <string name="empty_input">Please fill in the empty!</string>
 
-    <string name="example_item">ExampleChallenge</string>
+    <string name="example_item">ExampleItem</string>
     <string-array name="sample_challenge_array">
         <item>Email</item>
         <item>PIN</item>
@@ -67,6 +67,9 @@
     </string-array>
 
     <string name="invalid_identity">Please give me a valid, non-empty identity name!</string>
+    <string name="validate">Please fill in the following to finish your validation: </string>
+    <string name="download">Your certificate is ready, press continue to start download.</string>
+    <string name="download_finished">Certificate has already been installed to local keychain, now pick a picture for that ID.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

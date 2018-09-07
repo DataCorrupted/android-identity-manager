@@ -15,7 +15,8 @@ import android.widget.TextView;
 
 // TODO: Remove all V1 part.
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
+    private static final String TAG
+            = MainActivity.class.getSimpleName();
 
     protected static final String DB_NAME = "certDb.db";
     protected static final String CERT_DIR = "certDir";

@@ -9,19 +9,22 @@ import android.view.ViewGroup;
 import net.named_data.jndncert.client.RequestState;
 
 public class NdncertClientPageAdapter extends FragmentStatePagerAdapter {
+
     private int mNumOfTabs;
+
+    // Hack learned from stackoverflow to get current fragment
+    // See here: https://stackoverflow.com/questions/18609261/getting-the-current-fragment-instance-in-the-viewpager
+    private Fragment mCurrentFragment;
 
     public NdncertClientPageAdapter(FragmentManager fm, int NumOfTabs) {
         super(fm);
         this.mNumOfTabs = NumOfTabs;
     }
 
-    // Hack learned from stackoverflow to get current fragment
-    // See here: https://stackoverflow.com/questions/18609261/getting-the-current-fragment-instance-in-the-viewpager
-    private Fragment mCurrentFragment;
     public Fragment getCurrentFragment(){
         return mCurrentFragment;
     }
+
     @Override
     public void setPrimaryItem(
             ViewGroup container, int position, Object object) {

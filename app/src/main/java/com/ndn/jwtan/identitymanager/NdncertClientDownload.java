@@ -10,15 +10,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 public class NdncertClientDownload extends Fragment {
-    private static final String TAG = "NdncertClientDownload";
+
+    private static final String TAG
+            = NdncertClient.class.getSimpleName();
+
     public interface SendDownload{
         void sendDownload();
     }
+
     SendDownload mCallback;
+    private View.OnClickListener sendDownload
+            = view -> mCallback.sendDownload();
 
     public NdncertClientDownload() {
         // Required empty public constructor
     }
+
     public static NdncertClientDownload newInstance() {
 
         Bundle args = new Bundle();
@@ -37,6 +44,7 @@ public class NdncertClientDownload extends Fragment {
             Log.e(TAG, context.toString() + "must implement interface SendDownload");
         }
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +60,4 @@ public class NdncertClientDownload extends Fragment {
         btnContinue.setOnClickListener(sendDownload);
         return view;
     }
-
-    private View.OnClickListener sendDownload
-            = view -> mCallback.sendDownload();
 }

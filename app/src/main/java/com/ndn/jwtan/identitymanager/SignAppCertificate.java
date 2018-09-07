@@ -33,11 +33,14 @@ import static android.content.ContentValues.TAG;
 // TODO: Change this.
 public class SignAppCertificate extends Activity {
 
+    private static final String TAG
+            = SignAppCertificate.class.getSimpleName();
+
     ////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("zhehao", "sign request received");
+        Log.e(TAG, "sign request received");
         Intent intent = getIntent();
 
         String encoded = intent.getStringExtra("cert");

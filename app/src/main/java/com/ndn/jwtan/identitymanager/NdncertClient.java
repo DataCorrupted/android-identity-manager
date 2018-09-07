@@ -30,18 +30,19 @@ public class NdncertClient extends AppCompatActivity
             NdncertClientSelectChallenge.SendSelect,
             NdncertClientValidate.SendValidate,
             NdncertClientDownload.SendDownload{
-    private final String TAG = "NdncertClient";
+
+    private static final String TAG
+            = NdncertClient.class.getSimpleName();
 
     private ClientModule client;
-
     private int tabsCnt = 6;
     private UICustomViewPager viewPager;
     private TabLayout.Tab[] tabs = new TabLayout.Tab[tabsCnt];
     private NdncertClientPageAdapter adapter;
-
     private RequestState mState = new RequestState();
     private ChallengeModule mChallenge;
     private ClientModule.ErrorCallback errorCb = (errInfo -> Log.e(TAG, errInfo));
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -143,7 +144,6 @@ public class NdncertClient extends AppCompatActivity
                     (NdncertClientValidate)
                             adapter.getCurrentFragment();
             validateFragment.setRequirementList(
-                    mChallenge,
                     mChallenge.getValidateRequirements(mState.m_status));
         };
         mChallenge = challenge;
@@ -160,7 +160,7 @@ public class NdncertClient extends AppCompatActivity
     }
     @Override
     public void sendValidate(ArrayList<String> validateParamList){
-        ClientModule.RequestCallback validateCb = state ->{
+        ClientModule.RequestCallback validateCb = state -> {
             Log.i(TAG, "_VALIDATE date received");
             mState = state;
             Log.i(TAG, "State info recorded.");
@@ -175,7 +175,6 @@ public class NdncertClient extends AppCompatActivity
                     (NdncertClientValidate)
                             adapter.getCurrentFragment();
             validateFragment.setRequirementList(
-                    mChallenge,
                     mChallenge.getValidateRequirements(mState.m_status));
         };
         JSONObject paramJson = mChallenge.genSelectParamsJson(mState.m_status, validateParamList);

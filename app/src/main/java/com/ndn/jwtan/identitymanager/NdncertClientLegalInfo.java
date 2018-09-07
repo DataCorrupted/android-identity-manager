@@ -7,6 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class NdncertClientLegalInfo extends Fragment {
+
+    private static final String TAG
+            = NdncertClientLegalInfo.class.getSimpleName();
+
     public NdncertClientLegalInfo() {
         // Required empty public constructor
     }

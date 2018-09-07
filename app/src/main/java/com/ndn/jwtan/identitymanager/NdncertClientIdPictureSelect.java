@@ -10,6 +10,9 @@ import android.widget.Button;
 
 public class NdncertClientIdPictureSelect extends Fragment {
 
+    private static final String TAG
+            = NdncertClientIdPictureSelect.class.getSimpleName();
+
     public NdncertClientIdPictureSelect() {
         // Required empty public constructor
     }

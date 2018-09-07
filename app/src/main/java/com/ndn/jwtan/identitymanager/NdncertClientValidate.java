@@ -18,17 +18,41 @@ import net.named_data.jndncert.challenge.ChallengeModule;
 import java.util.ArrayList;
 
 public class NdncertClientValidate extends Fragment {
-    private final String TAG = "NdncertClientValidate";
+
+    private static final String TAG
+            = NdncertClientValidate.class.getSimpleName();
+
     public interface SendValidate{
         void sendValidate(ArrayList<String> validateParamList);
     }
+
     private SendValidate mCallback;
-    private ChallengeModule mChallenge;
     private ArrayList<String> mRequirementList = new ArrayList<>();
+    private ListView mListView;
+    private View.OnClickListener sendValidate = view -> {
+        ArrayList<String> validateParamList = new ArrayList<>();
+        for (int k=0; k < mListView.getAdapter().getCount(); k++){
+            View tempViewK = mListView.getChildAt(k);
+            EditText tempEditText = tempViewK.findViewById(R.id.validate_edit);
+            String tempStr = tempEditText.getText().toString();
+            if (tempStr.isEmpty()){
+                Toast.makeText(getContext(),
+                        R.string.empty_input,
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+            validateParamList.add(tempStr);
+        }
+        Toast.makeText(getContext(),
+                R.string.valid_input,
+                Toast.LENGTH_SHORT).show();
+        mCallback.sendValidate(validateParamList);
+    };
 
     public NdncertClientValidate() {
         // Required empty public constructor
     }
+
     public static NdncertClientValidate newInstance() {
 
         Bundle args = new Bundle();
@@ -53,7 +77,6 @@ public class NdncertClientValidate extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    private ListView mListView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -73,28 +96,7 @@ public class NdncertClientValidate extends Fragment {
         return view;
     }
 
-    private View.OnClickListener sendValidate = view -> {
-        ArrayList<String> validateParamList = new ArrayList<>();
-        for (int k=0; k < mListView.getAdapter().getCount(); k++){
-            View tempViewK = mListView.getChildAt(k);
-            EditText tempEditText = tempViewK.findViewById(R.id.validate_edit);
-            String tempStr = tempEditText.getText().toString();
-            if (tempStr.isEmpty()){
-                Toast.makeText(getContext(),
-                        R.string.empty_input,
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
-            validateParamList.add(tempStr);
-        }
-        Toast.makeText(getContext(),
-                R.string.valid_input,
-                Toast.LENGTH_SHORT).show();
-        mCallback.sendValidate(validateParamList);
-    };
-
-    public void setRequirementList(ChallengeModule challenge, ArrayList<String> requirementList){
-        mChallenge = challenge;
+    public void setRequirementList(ArrayList<String> requirementList){
         mRequirementList = requirementList;
         getActivity().getSupportFragmentManager()
                 .beginTransaction()

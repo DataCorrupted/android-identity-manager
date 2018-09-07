@@ -24,19 +24,25 @@ import net.named_data.jndncert.challenge.ChallengeModule;
 import java.util.ArrayList;
 
 public class NdncertClientSelectChallenge extends ListFragment {
-    private final String TAG = "NdncertClientSelect";
+    private static final String TAG
+            = NdncertClientSelectChallenge.class.getSimpleName();
+
     public interface SendSelect{
         void sendSelect(
                 String choice,
                 ChallengeModule challenge,
                 ArrayList<String> requirementList);
     }
+
     private SendSelect mCallback;
     private ArrayList<String> mChallengeList = new ArrayList<>();
+    private EditText editTexts[];
+    private AlertDialog dialog;
 
     public NdncertClientSelectChallenge() {
         // Required empty public constructor
     }
+
     public static NdncertClientSelectChallenge newInstance() {
 
         Bundle args = new Bundle();
@@ -78,8 +84,6 @@ public class NdncertClientSelectChallenge extends ListFragment {
         return view;
     }
 
-    private EditText editTexts[];
-    private AlertDialog dialog;
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);

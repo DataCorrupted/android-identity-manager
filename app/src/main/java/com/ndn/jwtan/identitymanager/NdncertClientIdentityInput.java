@@ -13,15 +13,34 @@ import android.widget.Toast;
 
 public class NdncertClientIdentityInput extends Fragment {
 
-    private String TAG = "NdncertClientIdentityInput";
+    private static final String TAG
+            = NdncertClientIdentityInput.class.getSimpleName();
+
     public interface SendNew{
         void sendNew(String identityStr);
     }
+
     SendNew mCallback;
+    private View.OnClickListener sendNewClick = view -> {
+        EditText editIdentity =
+                getActivity().findViewById(R.id.editIdentity);
+        String identityStr = editIdentity.getText().toString();
+        if (existsID(identityStr) || identityStr.isEmpty()){
+            Toast.makeText(getContext(),
+                    R.string.invalid_identity,
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Toast.makeText(getContext(),
+                R.string.valid_input,
+                Toast.LENGTH_SHORT).show();
+        mCallback.sendNew(identityStr);
+    };
 
     public NdncertClientIdentityInput() {
         // Required empty public constructor
     }
+
     public static NdncertClientIdentityInput newInstance() {
 
         Bundle args = new Bundle();
@@ -40,6 +59,7 @@ public class NdncertClientIdentityInput extends Fragment {
         }
         super.onAttach(context);
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,22 +74,6 @@ public class NdncertClientIdentityInput extends Fragment {
         btnContinue.setOnClickListener(sendNewClick);
         return view;
     }
-
-    private View.OnClickListener sendNewClick = view -> {
-        EditText editIdentity =
-                getActivity().findViewById(R.id.editIdentity);
-        String identityStr = editIdentity.getText().toString();
-        if (existsID(identityStr) || identityStr.isEmpty()){
-            Toast.makeText(getContext(),
-                    R.string.invalid_identity,
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Toast.makeText(getContext(),
-                R.string.valid_input,
-                Toast.LENGTH_SHORT).show();
-        mCallback.sendNew(identityStr);
-    };
 
     // TODO: Check if the id name exists before.
     Boolean existsID(String name){
